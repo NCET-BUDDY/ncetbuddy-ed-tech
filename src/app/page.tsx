@@ -1,16 +1,22 @@
-import { LandingCarousel } from "@/components/landing/LandingCarousel";
+import { Navbar } from "@/components/landing/Navbar";
+import { Hero } from "@/components/landing/Hero";
+import { StatsBar } from "@/components/landing/StatsBar";
+import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
+import { TestimonialsGrid } from "@/components/landing/TestimonialsGrid";
+import { UniversityLogos } from "@/components/landing/UniversityLogos";
+import { FinalCTA } from "@/components/landing/FinalCTA";
 import { Footer } from "@/components/landing/Footer";
-import { Proctoring } from "@/components/landing/Proctoring";
-import { Differentiation } from "@/components/landing/Differentiation";
-import { Testimonials } from "@/components/landing/Testimonials";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-background text-foreground selection:bg-primary/30">
-      <LandingCarousel />
-      <Proctoring />
-      <Differentiation />
-      <Testimonials />
+    <main className="min-h-screen bg-white text-foreground selection:bg-primary/30">
+      <Navbar />
+      <Hero />
+      <StatsBar />
+      <FeaturesGrid />
+      <TestimonialsGrid />
+      <UniversityLogos />
+      <FinalCTA />
       <Footer />
     </main>
   );

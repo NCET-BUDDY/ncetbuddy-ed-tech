@@ -1,54 +1,55 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 
-export function Hero({ isSlide = false }: { isSlide?: boolean }) {
+export function Hero() {
     return (
-        <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden bg-white">
-            {/* Background gradients */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px]" />
-                <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]" />
-            </div>
+        <section className="relative pt-44 pb-32 overflow-hidden bg-white">
+            <div className="container mx-auto px-4 relative z-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    {/* Left Column: Content */}
+                    <div className="text-left">
+                        {/* New Batch Badge */}
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-rose-50 border border-rose-100 rounded-lg mb-8">
+                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                            <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest">
+                                New ITEP Batch 2026 Starting Soon
+                            </span>
+                        </div>
 
-            <div className="container mx-auto px-4 relative z-10 text-center flex flex-col items-center">
-                {/* Logo: If slide, render invisible copy to preserve spacing. If not, render actual logo. */}
-                <div className={`w-24 h-24 md:w-32 md:h-32 mb-8 rounded-3xl overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(255,208,47,1)] bg-white animate-in zoom-in duration-700 ${isSlide ? 'opacity-0 pointer-events-none' : ''}`}>
-                    <img src="/logo.png" alt="NCET Buddy Logo" className="w-full h-full object-cover" />
-                </div>
+                        <h1 className="text-6xl md:text-7xl font-bold tracking-tighter text-black mb-8 leading-[1.05]">
+                            Master the NCET Exam with India's Most <span className="text-[#E11D48]">Trusted</span> Prep Buddy
+                        </h1>
 
-                {/* Badge: Keep visible or hide? User allowed keeping it. But strict "Logo stays outside". Badge is not Logo. Badge stays. */}
-                <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-primary border-2 border-black text-xs font-black uppercase tracking-widest text-black mb-10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                    <span className="flex h-3 w-3 rounded-full bg-white border-2 border-black animate-pulse" />
-                    NCET Buddy 2.0 is live
-                </div>
+                        <p className="text-lg text-zinc-500 font-medium max-w-xl mb-12 leading-relaxed">
+                            Empowering aspirants with expert-curated content, full-length mock tests, and previous year solutions designed for the ITEP entrance success.
+                        </p>
 
-                <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-10 leading-[0.9] text-black">
-                    CRACK NCET WITH <br />
-                    <span className="bg-black text-primary px-4 py-2 italic transform -rotate-2 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                        SMART AI PREP
-                    </span>
-                </h1>
-
-                <p className="text-xl md:text-2xl text-black font-bold max-w-2xl mx-auto mb-16 leading-tight opacity-70">
-                    Your personal roadmap to success. Mock Tests, Weakness Analysis, Doubt Forum, and Community Support all in one place.
-                </p>
-
-                {/* Buttons: If slide, completely hide (display: none) because new buttons are OUTSIDE carousel flow */}
-                {!isSlide && (
-                    <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                        <Link
-                            href="/login"
-                            className="px-10 py-5 bg-primary text-black font-black uppercase tracking-widest rounded-2xl hover:bg-white hover:-translate-y-2 transition-all border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none"
-                        >
-                            Start Practicing 🚀
-                        </Link>
-                        <Link
-                            href="/partner"
-                            className="px-10 py-5 bg-white text-black font-black uppercase tracking-widest rounded-2xl hover:bg-black hover:text-white hover:-translate-y-2 transition-all border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none"
-                        >
-                            Educator Login
-                        </Link>
+                        <div className="flex flex-col sm:flex-row gap-4 items-center">
+                            <Link href="/dashboard" className="w-full sm:w-auto">
+                                <Button className="w-full sm:w-auto px-10 py-7 bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold rounded-xl text-lg flex items-center justify-center gap-3">
+                                    Start Preparation <span className="text-2xl">→</span>
+                                </Button>
+                            </Link>
+                            <Link href="/#courses" className="w-full sm:w-auto">
+                                <Button variant="outline" className="w-full sm:w-auto px-10 py-7 text-zinc-600 font-bold rounded-xl text-lg bg-zinc-50 border-zinc-100 hover:bg-white">
+                                    Explore Courses
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
-                )}
+
+                    {/* Right Column: Illustration */}
+                    <div className="relative flex justify-center lg:justify-end">
+                        <div className="relative w-full max-w-[550px] aspect-square bg-[#E8F3F1] rounded-[3rem] overflow-hidden shadow-2xl">
+                            <img
+                                src="/hero-illustration.png"
+                                alt="Student Illustration"
+                                className="w-full h-full object-contain p-8"
+                            />
+                            {/* Visual decorative elements if any from the image can be added here */}
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
     );

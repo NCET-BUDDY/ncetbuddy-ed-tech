@@ -3,49 +3,46 @@ import { CalendarDays, ClipboardList, MessageCircle, BarChart2 } from "lucide-re
 export const Features = () => {
     const features = [
         {
-            title: "AI Smart Planner",
-            description: "No more confusion on what to study. Our AI analyzes your weak areas and creates a personalized daily roadmap.",
-            icon: (<CalendarDays size={28} />),
-            color: "bg-blue-500/10 text-blue-400"
-        },
-        {
-            title: "Real NTA Mocks",
-            description: "Practice on the exact same interface as the real exam. 10+ Full Syllabus Mocks & Chapter-wise Tests.",
+            title: "Full-Length Mock Tests",
+            description: "Practice in the real NTA interface. Save 20+ hours of trial and error with our expert-curated mock series.",
             icon: (<ClipboardList size={28} />),
-            color: "bg-purple-500/10 text-purple-400"
+            color: "text-orange-500"
         },
         {
-            title: "Doubt Forum",
-            description: "Stuck on a problem? Ask the community, discuss strategies, and get solutions from top rankers.",
+            title: "Topic-wise Notes",
+            description: "Stop searching for quality material. Get concise, 90% syllabus-matching notes that cover every NCET topic.",
+            icon: (<CalendarDays size={28} />),
+            color: "text-orange-500"
+        },
+        {
+            title: "Previous Year Questions",
+            description: "Master the exam pattern. Solve authentic PYQs with detailed explanations to avoid surprises on exam day.",
             icon: (<MessageCircle size={28} />),
-            color: "bg-green-500/10 text-green-400"
+            color: "text-orange-500"
         },
         {
-            title: "Deep Analytics",
-            description: "Track your accuracy, time management per question, and compare your live rank on the leaderboard.",
+            title: "Performance Analytics",
+            description: "Know exactly where you stand. Identify weak spots instantly and optimize your study schedule for a higher score.",
             icon: (<BarChart2 size={28} />),
-            color: "bg-orange-500/10 text-orange-400"
+            color: "text-orange-500"
         }
     ];
 
     return (
-        <section id="features" className="py-24 bg-white relative">
-            <div className="container mx-auto px-4 relative z-10">
+        <section id="features" className="py-24 bg-white relative overflow-hidden">
+            <div className="container mx-auto px-4">
                 <div className="text-center mb-20">
-                    <h2 className="text-4xl md:text-6xl font-black mb-6 text-black uppercase tracking-tighter italic">Why Choose NCET Buddy?</h2>
-                    <p className="text-black font-bold opacity-60 max-w-2xl mx-auto uppercase tracking-widest text-xs">
-                        The most advanced preparation platform for serious aspirants
-                    </p>
+                    <h2 className="text-4xl md:text-5xl font-black text-black tracking-tighter uppercase mb-6 italic">Why NCETBuddy?</h2>
+                    <p className="text-zinc-500 font-medium text-lg max-w-2xl mx-auto uppercase tracking-widest text-sm">Tailored for your success in the ITEP entrance exam.</p>
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {features.map((feature, index) => (
-                        <div key={index} className="bg-white border-4 border-black rounded-3xl p-8 hover:shadow-[12px_12px_0px_0px_rgba(255,208,47,1)] transition-all duration-300 hover:-translate-y-2 group">
-                            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 bg-black text-primary border-2 border-black group-hover:bg-primary group-hover:text-black transition-colors shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-2xl">
+                        <div key={index} className="bg-white border border-zinc-100 rounded-[2rem] p-10 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group shadow-sm flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-zinc-50 rounded-3xl flex items-center justify-center mb-8 text-primary group-hover:bg-primary group-hover:text-black transition-all duration-500 border border-zinc-100 shadow-sm">
                                 {feature.icon}
                             </div>
-                            <h3 className="text-2xl font-black mb-4 text-black uppercase italic leading-none">{feature.title}</h3>
-                            <p className="text-black font-bold opacity-60 text-sm leading-relaxed">{feature.description}</p>
+                            <h3 className="text-xl font-black text-black uppercase tracking-tight mb-4 leading-tight">{feature.title}</h3>
+                            <p className="text-zinc-500 font-medium text-sm leading-relaxed">{feature.description}</p>
                         </div>
                     ))}
                 </div>

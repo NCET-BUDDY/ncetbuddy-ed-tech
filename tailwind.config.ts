@@ -20,6 +20,9 @@ const config: Config = {
                 error: "var(--error)",
                 success: "var(--success)",
                 border: "var(--border)",
+                "primary-math": "var(--primary-math)",
+                "accent-math": "var(--accent-math)",
+                "urgency-math": "var(--urgency-math)",
             },
             animation: {
                 scroll: "scroll 40s linear infinite",

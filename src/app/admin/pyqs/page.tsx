@@ -13,7 +13,7 @@ export default function PYQManagerPage() {
     const [showForm, setShowForm] = useState(false);
 
     // Form State
-    const [title, setTitle] = useState(""); ,  
+    const [title, setTitle] = useState("");
     const [subject, setSubject] = useState("");
     const [year, setYear] = useState(new Date().getFullYear());
     const [url, setUrl] = useState("");

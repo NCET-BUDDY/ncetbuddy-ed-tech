@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { TrendingUp } from "lucide-react";
 
 export const LandingCarousel = () => {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -13,53 +14,60 @@ export const LandingCarousel = () => {
         {
             id: "ace-exam",
             content: (
-                <div className="flex flex-col items-center justify-center h-full px-4 max-w-5xl mx-auto text-center pt-28 pb-32">
-                    <div className="inline-block px-4 py-1.5 bg-white border-2 border-black rounded-full text-xs font-black uppercase tracking-widest mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] animate-bounce text-black">
-                        🚀 #1 Platform for NCET Aspirants
+                <div className="flex flex-col items-center justify-center h-full px-4 max-w-6xl mx-auto text-center pt-20 pb-32">
+                    <div className="inline-block px-6 py-2 bg-urgency-math text-white text-[11px] font-black uppercase tracking-[0.3em] mb-10 rounded-full shadow-2xl animate-bounce">
+                        🔥 NCET 2026 Batch is LIVE
                     </div>
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 leading-[0.9] text-black">
-                        Crack NCET <br className="hidden md:block" />
-                        <span className="bg-black text-primary px-4 py-2 transform -rotate-2 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mt-2 hover:scale-105 transition-transform">
-                            With Confidence
-                        </span>
+                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-10 leading-[0.85] text-white uppercase drop-shadow-2xl">
+                        ACE <span className="text-accent-math italic">NCET</span> <br />
+                        WITH CONFIDENCE
                     </h1>
 
-                    <p className="text-xl md:text-2xl text-black font-bold max-w-2xl mx-auto leading-tight opacity-80">
-                        The smartest way to prepare. <br className="hidden md:block" />
-                        AI Study Planner, Real NTA Mocks, and a supportive community.
+                    <p className="text-xl md:text-2xl text-zinc-300 font-medium max-w-3xl mx-auto leading-tight mb-12">
+                        Get into top <span className="text-white font-bold border-b-4 border-accent-math">ITEP Colleges</span> with India's most results-oriented prep platform.
                     </p>
+
+                    <div className="flex flex-col sm:flex-row gap-6 w-full justify-center items-center">
+                        <Link
+                            href="/login"
+                            className="group relative w-full sm:w-auto px-12 py-6 bg-primary-math text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-[0_20px_50px_rgba(51,94,234,0.3)] overflow-hidden"
+                        >
+                            <span className="relative z-10 flex items-center justify-center gap-3 text-lg">
+                                View Test Series <TrendingUp size={20} />
+                            </span>
+                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                        </Link>
+                        <Link
+                            href="/educator/login"
+                            className="w-full sm:w-auto px-12 py-6 bg-white/10 backdrop-blur-md text-white border-2 border-white/20 font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-white hover:text-black transition-all text-lg"
+                        >
+                            Login to Course
+                        </Link>
+                    </div>
+
+                    <div className="mt-16 text-zinc-500 font-black tracking-[0.4em] uppercase text-xs">
+                        #NCETBoleTohNCETBuddy
+                    </div>
                 </div>
             )
         },
         {
             id: "ai-roadmap",
             content: (
-                <div className="flex flex-col items-center justify-center h-full px-4 max-w-5xl mx-auto text-center pt-28 pb-32">
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 leading-[0.9] text-black">
-                        Your Personal <br className="hidden md:block" />
-                        <span className="bg-white text-black border-4 border-black px-4 py-2 transform rotate-1 inline-block shadow-[8px_8px_0px_0px_rgba(255,208,47,1)] mt-2">
-                            Success Roadmap
-                        </span>
+                <div className="flex flex-col items-center justify-center h-full px-4 max-w-6xl mx-auto text-center pt-20 pb-32">
+                    <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-10 leading-[0.85] text-white uppercase drop-shadow-2xl">
+                        YOUR AI <br />
+                        <span className="text-accent-math italic">SUCCESS</span> PATH
                     </h1>
-                    <p className="text-xl md:text-2xl text-black font-bold max-w-2xl mx-auto leading-tight opacity-80">
+                    <p className="text-xl md:text-2xl text-zinc-300 font-medium max-w-3xl mx-auto leading-tight mb-12">
                         Stop guessing what to study. Our AI identifies your weak areas and creates a daily plan just for you.
                     </p>
-                </div>
-            )
-        },
-        {
-            id: "community",
-            content: (
-                <div className="flex flex-col items-center justify-center h-full px-4 max-w-5xl mx-auto text-center pt-28 pb-32">
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-8 leading-[0.9] text-black">
-                        Never Prepare <br className="hidden md:block" />
-                        <span className="bg-primary text-black px-4 py-2 transform -rotate-2 inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mt-2">
-                            Alone
-                        </span>
-                    </h1>
-                    <p className="text-xl md:text-2xl text-black font-bold max-w-2xl mx-auto leading-tight opacity-80">
-                        Join thousands of serious aspirants. Solve doubts in our Forum and compete on the Leaderboard.
-                    </p>
+                    <Link
+                        href="/login"
+                        className="w-full sm:w-auto px-12 py-6 bg-primary-math text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-[0_20px_50px_rgba(51,94,234,0.3)] text-lg"
+                    >
+                        Start Prep Now 🚀
+                    </Link>
                 </div>
             )
         }
@@ -99,76 +107,53 @@ export const LandingCarousel = () => {
 
     return (
         <section
-            className="relative h-[90vh] min-h-[700px] bg-white flex flex-col overflow-hidden border-b-4 border-black"
+            className="relative h-screen min-h-[800px] bg-black flex flex-col overflow-hidden"
             onMouseEnter={() => setIsPaused(true)}
             onMouseLeave={() => setIsPaused(false)}
         >
-            {/* Background gradients (Persistent) */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-0">
-                <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px]" />
-                <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]" />
+            {/* Background Image with Dark Overlay */}
+            <div className="absolute inset-0 z-0">
+                <img
+                    src="/hero_background_study.png"
+                    alt="Background"
+                    className="w-full h-full object-cover opacity-40 mix-blend-luminosity scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-black/90 z-10" />
             </div>
 
             {/* Persistent Top Elements */}
-            <div className="absolute top-8 left-0 right-0 z-50 flex flex-col items-center pointer-events-none">
-                {/* Logo */}
-                <div className="w-24 h-24 md:w-28 md:h-28 mb-6 rounded-3xl overflow-hidden border-4 border-black shadow-[8px_8px_0px_0px_rgba(255,208,47,1)] bg-white pointer-events-auto hover:scale-105 transition-transform duration-300">
-                    <img src="/logo.png" alt="NCET Buddy Logo" className="w-full h-full object-cover" />
+            <div className="absolute top-12 left-0 right-0 z-50 flex justify-center pointer-events-none">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden shadow-2xl bg-white/10 backdrop-blur-xl border border-white/20 pointer-events-auto hover:rotate-6 transition-transform duration-500">
+                    <img src="/logo.png" alt="NCET Buddy Logo" className="w-full h-full object-cover p-2" />
                 </div>
             </div>
 
             {/* Carousel Content */}
             <div
-                className="relative z-10 w-full h-full text-black"
+                className="relative z-20 w-full h-full"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
             >
                 {slides.map((slide, index) => (
                     <div
                         key={slide.id}
-                        className={`absolute inset-0 w-full h-full transition-transform duration-700 ease-in-out flex items-center justify-center ${index === activeIndex
-                            ? "opacity-100 translate-x-0"
-                            : index < activeIndex
-                                ? "opacity-0 -translate-x-full"
-                                : "opacity-0 translate-x-full"
+                        className={`absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out flex items-center justify-center ${index === activeIndex
+                            ? "opacity-100 scale-100"
+                            : "opacity-0 scale-95 pointer-events-none"
                             }`}
-                        style={{
-                            // Override the class translation if needed for JS animation, but using classes for simplicity/performance
-                            // keeping style transform for the precise touch dragging if we were implementing that deeply, 
-                            // but here simplified to class switching for robustness.
-                            transform: index === activeIndex ? "translateX(0)" : index < activeIndex ? "translateX(-100%)" : "translateX(100%)"
-                        }}
                     >
                         {slide.content}
                     </div>
                 ))}
             </div>
 
-            {/* Persistent CTA Buttons (Bottom) */}
-            <div className="absolute bottom-12 left-0 right-0 z-50 flex flex-col items-center gap-4 px-4">
-                <div className="flex flex-col sm:flex-row gap-6 justify-center items-center w-full">
-                    <Link
-                        href="/login"
-                        className="w-full sm:w-auto text-center px-10 py-5 bg-primary text-black font-black uppercase tracking-widest rounded-2xl hover:bg-white hover:-translate-y-1 transition-all border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none bg-[#FFD02F] text-lg"
-                    >
-                        Start Practicing 🚀
-                    </Link>
-                    <Link
-                        href="/educator/login"
-                        className="w-full sm:w-auto text-center px-10 py-5 bg-black text-white font-black uppercase tracking-widest rounded-2xl hover:bg-gray-900 hover:text-white hover:-translate-y-1 transition-all border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-none text-lg"
-                    >
-                        Educator Login
-                    </Link>
-                </div>
-            </div>
-
             {/* Pagination Indicators */}
-            <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-40 hidden md:flex">
+            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-4 z-40">
                 {slides.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => setActiveIndex(index)}
-                        className={`w-4 h-4 rounded-full border-2 border-black transition-all duration-300 ${index === activeIndex ? "bg-primary scale-125 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" : "bg-white hover:bg-gray-100"
+                        className={`h-1.5 rounded-full transition-all duration-500 ${index === activeIndex ? "w-10 bg-primary-math" : "w-4 bg-white/20 hover:bg-white/40"
                             }`}
                         aria-label={`Go to slide ${index + 1}`}
                     />

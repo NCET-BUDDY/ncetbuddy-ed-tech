@@ -5,13 +5,16 @@
 :root {
   --background: #FFFFFF;
   --foreground: #000000;
-  --primary: #FFD02F;
-  --primary-hover: #E5BB2A;
+  --primary: #E11D48;
+  --primary-hover: #BE123C;
   --card-bg: #FFFFFF;
-  --text-secondary: #000000;
+  --text-secondary: #64748B;
   --error: #EF4444;
   --success: #10B981;
-  --border: #000000;
+  --border: #F1F5F9;
+  --primary-math: #335eea;
+  --accent-math: #fad776;
+  --urgency-math: #E11D48;
 }
 
 body {
