@@ -23,7 +23,7 @@ export const Footer = () => {
                             <Link href="#" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
                                 <Twitter size={18} className="text-white" />
                             </Link>
-                            <Link href="#" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                            <Link href="https://www.youtube.com/@NCETBuddy" target="_blank" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
                                 <Youtube size={18} className="text-white" />
                             </Link>
                             <Link href="#" className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
