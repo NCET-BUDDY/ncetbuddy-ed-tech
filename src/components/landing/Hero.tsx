@@ -24,14 +24,14 @@ export function Hero() {
                             Empowering aspirants with expert-curated content, full-length mock tests, and previous year solutions designed for the ITEP entrance success.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4 items-center flex-wrap">
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center">
                             <Link href="/dashboard" className="w-full sm:w-auto">
-                                <Button className="w-full sm:w-auto px-10 py-7 bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold rounded-xl text-lg flex items-center justify-center gap-3">
-                                    Start Preparation <span className="text-2xl">→</span>
+                                <Button className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-7 bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold rounded-xl text-base sm:text-lg flex items-center justify-center gap-2 sm:gap-3">
+                                    Start Preparation <span className="text-xl sm:text-2xl">→</span>
                                 </Button>
                             </Link>
                             <Link href="/#courses" className="w-full sm:w-auto">
-                                <Button variant="outline" className="w-full sm:w-auto px-10 py-7 text-zinc-600 font-bold rounded-xl text-lg bg-zinc-50 border-zinc-100 hover:bg-white">
+                                <Button variant="outline" className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-7 text-zinc-600 font-bold rounded-xl text-base sm:text-lg bg-zinc-50 border-zinc-100 hover:bg-white">
                                     Explore Courses
                                 </Button>
                             </Link>
@@ -40,7 +40,7 @@ export function Hero() {
                                 target="_blank"
                                 className="w-full sm:w-auto"
                             >
-                                <Button variant="outline" className="w-full sm:w-auto px-10 py-7 text-rose-500 font-bold rounded-xl text-lg bg-white border-rose-200 hover:bg-rose-50 border-2">
+                                <Button variant="outline" className="w-full sm:w-auto px-6 sm:px-10 py-3 sm:py-7 text-rose-500 font-bold rounded-xl text-base sm:text-lg bg-white border-rose-200 hover:bg-rose-50 border-2">
                                     Download Priority Order
                                 </Button>
                             </Link>
