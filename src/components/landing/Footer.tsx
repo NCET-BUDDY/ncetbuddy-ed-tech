@@ -66,6 +66,13 @@ export const Footer = () => {
                     </div>
                 </div>
 
+                <div className="py-12 px-6 bg-[#0b1120] rounded-2xl mb-12 text-center">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white" style={{ fontFamily: "Dancing Script, cursive" }}>
+                        NCET Bole to NCETBuddy
+                        <span className="block w-32 h-1 bg-[#E11D48] mx-auto mt-3"></span>
+                    </h2>
+                </div>
+
                 <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
                     <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-widest">
                         © 2024 NCETBUDDY.IN • ALL RIGHTS RESERVED.
