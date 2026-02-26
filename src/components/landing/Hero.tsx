@@ -24,7 +24,7 @@ export function Hero() {
                             Empowering aspirants with expert-curated content, full-length mock tests, and previous year solutions designed for the ITEP entrance success.
                         </p>
 
-                        <div className="flex flex-col sm:flex-row gap-4 items-center">
+                        <div className="flex flex-col sm:flex-row gap-4 items-center flex-wrap">
                             <Link href="/dashboard" className="w-full sm:w-auto">
                                 <Button className="w-full sm:w-auto px-10 py-7 bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold rounded-xl text-lg flex items-center justify-center gap-3">
                                     Start Preparation <span className="text-2xl">→</span>
@@ -33,6 +33,15 @@ export function Hero() {
                             <Link href="/#courses" className="w-full sm:w-auto">
                                 <Button variant="outline" className="w-full sm:w-auto px-10 py-7 text-zinc-600 font-bold rounded-xl text-lg bg-zinc-50 border-zinc-100 hover:bg-white">
                                     Explore Courses
+                                </Button>
+                            </Link>
+                            <Link
+                                href="https://drive.google.com/file/d/1NiwzcyYH5ve9XSla6Fp5mO4bs6FlK_XD/view?usp=drivesdk"
+                                target="_blank"
+                                className="w-full sm:w-auto"
+                            >
+                                <Button variant="outline" className="w-full sm:w-auto px-10 py-7 text-rose-500 font-bold rounded-xl text-lg bg-white border-rose-200 hover:bg-rose-50 border-2">
+                                    Download Priority Order
                                 </Button>
                             </Link>
                         </div>
