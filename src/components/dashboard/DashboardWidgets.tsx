@@ -107,7 +107,7 @@ export const MockTestEngine = ({ tests }: { tests: any[] }) => {
 // --- Community Discussion Section ---
 export const CommunityDiscussion = ({ posts }: { posts: any[] }) => {
     return (
-        <Card className="bg-white border-slate-100 shadow-sm rounded-3xl overflow-hidden flex flex-col h-full">
+        <Card className="bg-white border-slate-100 shadow-sm rounded-3xl overflow-hidden flex flex-col">
             <div className="p-6 border-b border-slate-50">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-500">
@@ -205,17 +205,17 @@ export const AISmartPlanner = ({ target, progress }: { target: string, progress:
 // --- Performance Analytics Section ---
 export const PerformanceAnalytics = ({ score, trend }: { score: number, trend: number }) => {
     return (
-        <Card className="bg-white border-slate-100 shadow-sm p-6 rounded-3xl h-full flex flex-col">
-            <div className="flex justify-between items-center mb-8">
+        <Card className="bg-white border-slate-100 shadow-sm p-6 rounded-3xl flex flex-col">
+            <div className="flex justify-between items-center mb-6 md:mb-8">
                 <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-rose-500">
                         <TrendingUp size={18} />
                     </div>
-                    <h2 className="text-lg font-black text-slate-900 tracking-tight">Performance Analytics</h2>
+                    <h2 className="text-lg font-black text-slate-900 tracking-tight">Analytics</h2>
                 </div>
             </div>
 
-            <div className="flex-1 grid grid-cols-1 gap-6">
+            <div className="space-y-6">
                 <div>
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-sm font-black text-slate-900">Score Trend</h3>
@@ -224,12 +224,16 @@ export const PerformanceAnalytics = ({ score, trend }: { score: number, trend: n
                         </div>
                     </div>
 
-                    {/* Simple SVG Trendline to match design */}
-                    <div className="h-24 w-full relative group">
-                        <svg className="w-full h-full overflow-visible" preserveAspectRatio="none">
+                    {/* Improved Responsive SVG Trendline */}
+                    <div className="h-24 w-full relative group bg-slate-50/50 rounded-xl p-2">
+                        <svg
+                            className="w-full h-full"
+                            viewBox="0 0 500 100"
+                            preserveAspectRatio="none"
+                        >
                             <path
                                 d="M0 80 Q 50 75, 100 80 T 200 60 T 300 55 T 400 30 T 500 35 L 500 100 L 0 100 Z"
-                                fill="url(#gradient)"
+                                fill="url(#gradient-fixed)"
                                 fillOpacity="0.1"
                             />
                             <path
@@ -240,7 +244,7 @@ export const PerformanceAnalytics = ({ score, trend }: { score: number, trend: n
                                 strokeLinecap="round"
                             />
                             <defs>
-                                <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <linearGradient id="gradient-fixed" x1="0%" y1="0%" x2="0%" y2="100%">
                                     <stop offset="0%" stopColor="#E11D48" />
                                     <stop offset="100%" stopColor="transparent" />
                                 </linearGradient>
@@ -252,19 +256,16 @@ export const PerformanceAnalytics = ({ score, trend }: { score: number, trend: n
                             <span>Week 3</span>
                             <span>Current</span>
                         </div>
-
-                        {/* Tooltip dot */}
-                        <div className="absolute top-[35px] right-[5%] w-3 h-3 bg-rose-500 rounded-full border-2 border-white shadow-md cursor-pointer hover:scale-125 transition-transform" />
                     </div>
                 </div>
 
-                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex justify-between items-center mt-auto">
+                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex justify-between items-center">
                     <div>
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Projected NCET Score</p>
                         <h4 className="text-2xl font-black text-slate-900">{score}</h4>
                     </div>
                     <div className="text-right">
-                        <span className="text-[10px] font-black text-emerald-500">+{trend}% vs last week</span>
+                        <span className="text-[10px] font-black text-emerald-500">+{trend}%</span>
                     </div>
                 </div>
             </div>
@@ -292,23 +293,26 @@ export const ResourceLibrary = () => {
             </div>
 
             <Card className="bg-white border-slate-100 shadow-sm rounded-3xl overflow-hidden">
-                <div className="flex border-b border-slate-100 px-6 overflow-x-auto no-scrollbar">
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`
-                                flex items-center gap-2 px-6 py-4 text-xs font-black uppercase tracking-tight transition-all relative whitespace-nowrap
-                                ${activeTab === tab.id ? 'text-rose-500' : 'text-slate-400 hover:text-slate-600'}
-                            `}
-                        >
-                            {tab.icon}
-                            {tab.label}
-                            {activeTab === tab.id && (
-                                <div className="absolute bottom-0 left-0 right-0 h-1 bg-rose-500 rounded-t-full" />
-                            )}
-                        </button>
-                    ))}
+                <div className="flex border-b border-slate-100 px-4 md:px-6 overflow-x-auto no-scrollbar scroll-smooth">
+                    <div className="flex flex-nowrap min-w-full">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`
+                                    flex items-center gap-2 px-4 md:px-6 py-4 text-[10px] md:text-xs font-black uppercase tracking-tight transition-all relative whitespace-nowrap flex-shrink-0
+                                    ${activeTab === tab.id ? 'text-rose-500' : 'text-slate-400 hover:text-slate-600'}
+                                `}
+                            >
+                                {tab.icon}
+                                <span className="hidden sm:inline-block">{tab.label}</span>
+                                <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+                                {activeTab === tab.id && (
+                                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-rose-500 rounded-t-full" />
+                                )}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 <div className="p-8">
