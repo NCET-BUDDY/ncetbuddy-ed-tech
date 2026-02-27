@@ -3,6 +3,7 @@
 import React from 'react';
 import { Navbar } from '@/components/landing/Navbar';
 import { Footer } from '@/components/landing/Footer';
+import Link from 'next/link';
 import { Lightbulb, Rocket, Zap, BrainCircuit } from 'lucide-react';
 
 export default function PreparationPage() {
@@ -43,13 +44,17 @@ export default function PreparationPage() {
                             <p className="text-lg text-zinc-600 leading-relaxed mb-6">
                                 With the increasing competition for IIT and NIT ITEP programs, "General Awareness" and "Teaching Aptitude" are becoming the real differentiators. Most students score well in Language and Domain subjects, but lose ranks in these two sections. We recommend starting your Teaching Aptitude preparation early to build the right mindset.
                             </p>
-                            <div className="flex gap-4">
-                                <button className="bg-[#E11D48] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#BE123C] transition-colors">
-                                    Start Full Prep
-                                </button>
-                                <button className="bg-white border border-zinc-200 text-[#0F172A] px-8 py-4 rounded-xl font-bold hover:bg-zinc-100 transition-colors">
-                                    Explore Free PYQs
-                                </button>
+                            <div className="flex flex-wrap gap-4">
+                                <Link href="/dashboard">
+                                    <button className="bg-[#E11D48] text-white px-8 py-4 rounded-xl font-bold hover:bg-[#BE123C] transition-colors whitespace-nowrap">
+                                        Start Full Prep
+                                    </button>
+                                </Link>
+                                <Link href="/dashboard/tests">
+                                    <button className="bg-white border border-zinc-200 text-[#0F172A] px-8 py-4 rounded-xl font-bold hover:bg-zinc-100 transition-colors whitespace-nowrap">
+                                        Explore Free PYQs
+                                    </button>
+                                </Link>
                             </div>
                         </section>
                     </div>

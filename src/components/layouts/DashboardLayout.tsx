@@ -59,19 +59,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex min-h-screen bg-[#F8FAFC] text-slate-900 font-sans">
             {/* Sidebar for Desktop */}
             <aside className="hidden md:flex w-64 flex-col bg-[#0F172A] text-white h-screen sticky top-0 z-40">
-                <div className="p-6">
+                <div className="p-8">
                     <Link href="/" className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg overflow-hidden bg-rose-500 flex items-center justify-center">
-                            <Image src="/logo.png" alt="Logo" width={32} height={32} />
+                        <div className="w-10 h-10 rounded-xl overflow-hidden bg-rose-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
+                            <Image src="/logo.png" alt="Logo" width={40} height={40} className="w-full h-full object-cover" />
                         </div>
-                        <div className="text-xl font-bold tracking-tight text-white">
-                            NCET<span className="text-white/60 font-medium">Buddy</span>
+                        <div className="text-2xl font-black tracking-tighter text-white">
+                            NCET<span className="text-rose-500">Buddy</span>
                         </div>
                     </Link>
-                    <div className="text-[10px] font-bold text-white/30 uppercase tracking-widest mt-1 ml-11">Student Portal</div>
+                    <div className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mt-2 ml-1">Student Portal</div>
                 </div>
 
-                <nav className="flex-1 px-4 py-8 space-y-2">
+                <nav className="flex-1 px-4 py-4 space-y-1">
                     {navItems.map((item) => {
                         const isActive = pathname === item.href;
                         return (
@@ -79,15 +79,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 key={item.href}
                                 href={item.href}
                                 className={`
-                                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                                    flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 group
                                     ${isActive
-                                        ? "bg-rose-500/10 text-rose-500 font-bold"
+                                        ? "bg-rose-500 text-white font-bold shadow-lg shadow-rose-500/20"
                                         : "text-slate-400 hover:text-white hover:bg-white/5"
                                     }
                                 `}
                             >
-                                {item.icon}
-                                <span className="text-sm">{item.label}</span>
+                                <span className={`${isActive ? "text-white" : "text-slate-500 group-hover:text-white-400"} transition-colors`}>
+                                    {item.icon}
+                                </span>
+                                <span className="text-sm tracking-tight">{item.label}</span>
                             </Link>
                         );
                     })}
@@ -137,13 +139,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                         <div className="h-10 w-[1px] bg-slate-200 hidden md:block" />
 
-                        <div className="flex items-center gap-3 pl-2 cursor-pointer group">
+                        <div className="flex items-center gap-3 pl-4 cursor-pointer group">
                             <div className="text-right hidden sm:block">
-                                <div className="text-sm font-bold text-slate-900 group-hover:text-rose-500 transition-colors">Arjun Mehta</div>
-                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Science Stream</div>
+                                <div className="text-sm font-black text-slate-900 group-hover:text-rose-500 transition-colors">{user.name || "Arjun Mehta"}</div>
+                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Science Stream</div>
                             </div>
-                            <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-white shadow-sm ring-1 ring-slate-200">
-                                <Image src="/student.png" alt="User" width={40} height={40} className="w-full h-full object-cover" />
+                            <div className="w-11 h-11 rounded-2xl overflow-hidden border-2 border-white shadow-md ring-1 ring-slate-100 group-hover:scale-105 transition-transform">
+                                <Image src="/student.png" alt="User" width={44} height={44} className="w-full h-full object-cover" />
                             </div>
                         </div>
                     </div>
