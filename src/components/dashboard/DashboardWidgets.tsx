@@ -157,7 +157,9 @@ export const CommunityDiscussion = ({ posts }: { posts: any[] }) => {
 };
 
 // --- AI Smart Planner Section ---
-export const AISmartPlanner = ({ target, progress }: { target: string, progress: number }) => {
+import { PlannerTask } from '@/lib/appwrite-db';
+
+export const AISmartPlanner = ({ task }: { task: PlannerTask }) => {
     return (
         <Card className="bg-white border-slate-100 shadow-sm p-6 rounded-3xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 text-rose-500/10 group-hover:scale-110 transition-transform">
@@ -177,26 +179,28 @@ export const AISmartPlanner = ({ target, progress }: { target: string, progress:
                 </div>
                 <div className="flex-1 space-y-4">
                     <div className="space-y-1">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Today's Target</p>
-                        <h3 className="text-base font-black text-slate-900">{target}</h3>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{task.subtitle}</p>
+                        <h3 className="text-base font-black text-slate-900 leading-tight">{task.title}</h3>
                     </div>
 
                     <div className="space-y-2">
                         <div className="flex justify-between items-end">
-                            <span className="text-[10px] font-black text-slate-500 uppercase">{progress}% Completed</span>
+                            <span className="text-[10px] font-black text-slate-500 uppercase">Daily Goal: {task.progress}% Completed</span>
                         </div>
                         <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-rose-500 rounded-full transition-all duration-1000 ease-out"
-                                style={{ width: `${progress}%` }}
+                                style={{ width: `${task.progress}%` }}
                             />
                         </div>
                     </div>
                 </div>
 
-                <Button className="bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl px-4 py-6 shadow-lg shadow-rose-500/20 active:translate-y-0.5 transition-all text-[11px] uppercase tracking-tighter flex items-center gap-2">
-                    <CheckCircle2 size={14} /> Mark as Done
-                </Button>
+                <Link href={task.actionUrl} className="shrink-0">
+                    <Button className="bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl px-4 py-6 shadow-lg shadow-rose-500/20 active:translate-y-0.5 transition-all text-[11px] uppercase tracking-tighter flex items-center gap-2">
+                        <CheckCircle2 size={14} /> {task.actionText}
+                    </Button>
+                </Link>
             </div>
         </Card>
     );

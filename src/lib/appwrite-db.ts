@@ -496,6 +496,78 @@ export const getUserTestResults = async (userId: string): Promise<TestResult[]> 
     }
 };
 
+export interface PlannerTask {
+    title: string;
+    subtitle: string;
+    actionText: string;
+    actionUrl: string;
+    progress: number;
+}
+
+export const getDynamicPlannerTask = async (userId: string): Promise<PlannerTask> => {
+    try {
+        const results = await getUserTestResults(userId);
+
+        // Base case: No tests taken yet
+        if (!results || results.length === 0) {
+            return {
+                title: "Take your First Diagnostic Mock",
+                subtitle: "0% Completed",
+                actionText: "Start Test",
+                actionUrl: "/dashboard/tests",
+                progress: 0
+            };
+        }
+
+        const latestResult = results[0];
+        const maxScore = latestResult.totalQuestions ? latestResult.totalQuestions * 4 : 400; // assumption
+        const percentage = maxScore > 0 ? (latestResult.score / maxScore) * 100 : 0;
+
+        // Fetch user's overall daily progress to still show bar completion 
+        const daily = await getDailyProgress(userId);
+        let dailyPercent = 0;
+        if (daily && daily.dailyGoalTarget > 0) {
+            dailyPercent = Math.min(Math.round((daily.dailyProgress / daily.dailyGoalTarget) * 100), 100);
+        }
+
+        // Generate dynamic task based on latest percentage
+        if (percentage < 40) {
+            return {
+                title: "Review Foundational Concepts",
+                subtitle: `Scored ${Math.round(percentage)}% recently - Need revision!`,
+                actionText: "Watch Lectures",
+                actionUrl: "/learning",
+                progress: dailyPercent
+            };
+        } else if (percentage >= 40 && percentage < 75) {
+            return {
+                title: "Practice Weak Sections",
+                subtitle: "Solidify your understanding",
+                actionText: "Explore PYQs",
+                actionUrl: "/dashboard/tests/pyq",
+                progress: dailyPercent
+            };
+        } else {
+            return {
+                title: "Attempt Advanced Full Mock",
+                subtitle: `Great score! (${Math.round(percentage)}%) Keep pushing.`,
+                actionText: "Take Challenge",
+                actionUrl: "/dashboard/tests",
+                progress: dailyPercent
+            };
+        }
+    } catch (error) {
+        console.error("Error generating dynamic task:", error);
+        return {
+            title: "Continue Daily Practice",
+            subtitle: "Keep your streak going",
+            actionText: "Practice Now",
+            actionUrl: "/dashboard/tests",
+            progress: 0
+        };
+    }
+};
+
 // --- Books / Notes ---
 export const getBooks = async (): Promise<Book[]> => {
     if (!isAppwriteConfigured()) return [];

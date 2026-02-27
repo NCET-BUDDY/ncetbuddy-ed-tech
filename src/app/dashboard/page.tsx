@@ -3,7 +3,7 @@
 import React from 'react';
 import BannerCarousel from '@/components/dashboard/BannerCarousel';
 import { useEffect, useState } from 'react';
-import { getBooks, getFormulaCards, getTests, getForumPosts, getDailyProgress, getUserTestResults } from '@/lib/appwrite-db';
+import { getBooks, getFormulaCards, getTests, getForumPosts, getDailyProgress, getUserTestResults, getDynamicPlannerTask, PlannerTask } from '@/lib/appwrite-db';
 import { Test, ForumPost } from '@/types';
 import {
     MockTestEngine,
@@ -65,7 +65,13 @@ export default function DashboardPage() {
     const { user } = useAuth();
     const [tests, setTests] = useState<Test[]>([]);
     const [posts, setPosts] = useState<any[]>([]);
-    const [plannerData, setPlannerData] = useState({ target: "Loading target...", progress: 0 });
+    const [plannerData, setPlannerData] = useState<PlannerTask>({
+        title: "Loading target...",
+        subtitle: "Calculating next steps",
+        actionText: "Wait",
+        actionUrl: "#",
+        progress: 0
+    });
     const [analyticsData, setAnalyticsData] = useState({ score: 0, trend: 0 });
     const [loading, setLoading] = useState(true);
 
@@ -96,18 +102,10 @@ export default function DashboardPage() {
                     { title: "Important Organic Chemistry chapters?", preview: "Focus on reaction mechanisms or named...", authorAvatar: "/student.png", repliesCount: 5, hasExpertReply: false }
                 ]);
 
-                // Fetch Planner Data (derived from streak/daily progress if available)
+                // Fetch Planner Data (Dynamic based on test results)
                 if (user?.$id) {
-                    const progress = await getDailyProgress(user.$id);
-                    if (progress) {
-                        let percent = Math.round((progress.dailyProgress / progress.dailyGoalTarget) * 100);
-                        // Cap at 100% for the UI progress bar to accurately reflect completion without overflowing
-                        if (percent > 100) percent = 100;
-                        setPlannerData({
-                            target: `Complete ${progress.dailyGoalTarget} Daily Questions`,
-                            progress: percent
-                        });
-                    }
+                    const dynamicTask = await getDynamicPlannerTask(user.$id);
+                    setPlannerData(dynamicTask);
 
                     // Fetch Performance Analytics
                     try {
@@ -180,7 +178,7 @@ export default function DashboardPage() {
                         <MockTestEngine tests={tests} />
 
                         {/* AI Smart Planner */}
-                        <AISmartPlanner target={plannerData.target} progress={plannerData.progress} />
+                        <AISmartPlanner task={plannerData} />
                     </div>
 
                     {/* Right Column (4 slots) */}
