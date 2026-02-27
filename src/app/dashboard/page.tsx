@@ -3,8 +3,8 @@
 import React from 'react';
 import BannerCarousel from '@/components/dashboard/BannerCarousel';
 import { useEffect, useState } from 'react';
-import { getBooks, getFormulaCards, getTests, getForumPosts, getDailyProgress, getUserTestResults, getDynamicPlannerTask, PlannerTask } from '@/lib/appwrite-db';
-import { Test, ForumPost } from '@/types';
+import { getBooks, getFormulaCards, getTests, getForumPosts, getDailyProgress, getUserTestResults, getDynamicPlannerTask, PlannerTask, getAllEducatorVideos } from '@/lib/appwrite-db';
+import { Test, ForumPost, Book, FormulaCard, VideoClass } from '@/types';
 import {
     MockTestEngine,
     CommunityDiscussion,
@@ -74,6 +74,11 @@ export default function DashboardPage() {
     });
     const [analyticsData, setAnalyticsData] = useState({ score: 0, trend: 0 });
     const [loading, setLoading] = useState(true);
+
+    // Resource Library States
+    const [books, setBooks] = useState<Book[]>([]);
+    const [formulaCards, setFormulaCards] = useState<FormulaCard[]>([]);
+    const [videos, setVideos] = useState<VideoClass[]>([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -150,6 +155,28 @@ export default function DashboardPage() {
                     }
                 }
 
+                // Fetch Resource Library Items
+                const [booksData, formulaData, videosData] = await Promise.all([
+                    getBooks(),
+                    getFormulaCards(),
+                    getAllEducatorVideos()
+                ]);
+
+                setBooks(booksData);
+                setFormulaCards(formulaData);
+
+                // Map local EducatorVideos to match the VideoClass interface expected by ResourceLibrary if needed, 
+                // but getAllEducatorVideos actually returns `EducatorVideo` which is mostly compatible.
+                // We'll safely map it to match UI expectations.
+                const mappedVideos = videosData.map((v: any) => ({
+                    id: v.id,
+                    title: v.title,
+                    url: v.url,
+                    thumbnailUrl: `https://img.youtube.com/vi/${v.url.split('v=')[1]?.split('&')[0]}/hqdefault.jpg`,
+                    subject: 'Lectures'
+                }));
+                setVideos(mappedVideos);
+
             } catch (error) {
                 console.error("Failed to fetch dashboard data:", error);
                 setTests(MOCK_TESTS.map(t => ({ ...t, questionsCount: 0, duration: 180 })));
@@ -179,6 +206,9 @@ export default function DashboardPage() {
 
                         {/* AI Smart Planner */}
                         <AISmartPlanner task={plannerData} />
+
+                        {/* Resource Library */}
+                        <ResourceLibrary books={books} formulaCards={formulaCards} videos={videos} />
                     </div>
 
                     {/* Right Column (4 slots) */}
@@ -191,8 +221,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Bottom Section - Full Width */}
-                <ResourceLibrary />
+                {/* Bottom Section removed duplicate library */}
             </div>
         </div>
     );

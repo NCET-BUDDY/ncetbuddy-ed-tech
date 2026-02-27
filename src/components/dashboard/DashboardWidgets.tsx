@@ -304,8 +304,16 @@ export const PerformanceAnalytics = ({ score, trend, history = [] }: { score: nu
     );
 };
 
+import { Book, FormulaCard as DBFormulaCard, VideoClass } from '@/types';
+
 // --- Resource Library Section ---
-export const ResourceLibrary = () => {
+interface ResourceLibraryProps {
+    books: Book[];
+    formulaCards: DBFormulaCard[];
+    videos: VideoClass[];
+}
+
+export const ResourceLibrary = ({ books, formulaCards, videos }: ResourceLibraryProps) => {
     const [activeTab, setActiveTab] = useState('video');
 
     const tabs = [
@@ -346,16 +354,98 @@ export const ResourceLibrary = () => {
                     </div>
                 </div>
 
-                <div className="p-8">
-                    {/* Placeholder for tab content - in reality this would fetch existing data */}
-                    <div className="flex flex-col items-center justify-center py-12 text-center text-slate-300">
-                        <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center mb-4">
-                            <BookOpen size={24} />
+                <div className="p-4 md:p-6 bg-slate-50/30">
+                    {/* Videos Tab */}
+                    {activeTab === 'video' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {videos && videos.length > 0 ? (
+                                videos.slice(0, 3).map((video, idx) => (
+                                    <a key={idx} href={video.url} target="_blank" rel="noopener noreferrer" className="group block h-full">
+                                        <div className="bg-white border text-left border-slate-100 p-3 rounded-2xl shadow-sm hover:shadow-md hover:border-rose-100 transition-all h-full flex flex-col">
+                                            <div className="aspect-video w-full bg-slate-100 rounded-xl mb-3 relative overflow-hidden flex-shrink-0">
+                                                {video.thumbnailUrl ? (
+                                                    <Image src={video.thumbnailUrl} alt={video.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                        <Video size={32} />
+                                                    </div>
+                                                )}
+                                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                                    <div className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-rose-500 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all">
+                                                        <Video size={16} className="ml-1" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <h4 className="text-xs font-bold text-slate-800 line-clamp-2 leading-tight flex-grow group-hover:text-rose-600 transition-colors">{video.title}</h4>
+                                            {video.subject && (
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2 shrink-0">{video.subject}</p>
+                                            )}
+                                        </div>
+                                    </a>
+                                ))
+                            ) : (
+                                <div className="col-span-full flex flex-col items-center justify-center py-12 text-center text-slate-300">
+                                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm border border-slate-100">
+                                        <Video size={24} />
+                                    </div>
+                                    <p className="text-sm font-bold uppercase tracking-widest leading-relaxed">No Recent Videos</p>
+                                </div>
+                            )}
                         </div>
-                        <p className="text-sm font-bold uppercase tracking-widest leading-relaxed">
-                            Loading your {activeTab === 'video' ? 'lectures' : activeTab === 'notes' ? 'documents' : 'materials'}...
-                        </p>
-                    </div>
+                    )}
+
+                    {/* Notes Tab */}
+                    {activeTab === 'notes' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {books && books.length > 0 ? (
+                                books.slice(0, 3).map((book, idx) => (
+                                    <a key={idx} href={book.url} target="_blank" rel="noopener noreferrer" className="bg-white text-left border border-slate-100 p-4 rounded-2xl shadow-sm hover:shadow-md hover:border-emerald-100 hover:bg-emerald-50/30 transition-all group flex items-start gap-4 h-full">
+                                        <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-110 transition-transform">
+                                            <FileText size={20} />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-xs font-bold text-slate-800 line-clamp-2 mb-1 leading-tight group-hover:text-emerald-700">{book.title}</h4>
+                                            <p className="text-[10px] font-black text-slate-400 shrink-0 uppercase tracking-widest">{book.subject}</p>
+                                        </div>
+                                    </a>
+                                ))
+                            ) : (
+                                <div className="col-span-full flex flex-col items-center justify-center py-12 text-center text-slate-300">
+                                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm border border-slate-100">
+                                        <FileText size={24} />
+                                    </div>
+                                    <p className="text-sm font-bold uppercase tracking-widest leading-relaxed">No Notes Available</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Formula Tab */}
+                    {activeTab === 'formula' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {formulaCards && formulaCards.length > 0 ? (
+                                formulaCards.slice(0, 3).map((card, idx) => (
+                                    <a key={idx} href={card.url || '#'} target="_blank" rel="noopener noreferrer" className="bg-white text-left border border-slate-100 p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-violet-100 hover:bg-violet-50/30 transition-all group flex flex-col h-full relative overflow-hidden">
+                                        <div className="absolute -right-4 -top-4 w-16 h-16 bg-violet-50 rounded-full group-hover:scale-150 transition-transform duration-500" />
+                                        <div className="flex items-center gap-3 mb-3 relative z-10">
+                                            <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center text-violet-600 shrink-0">
+                                                <FileSignature size={14} />
+                                            </div>
+                                            <p className="text-[10px] font-black text-slate-400 shrink-0 uppercase tracking-widest">{card.subject}</p>
+                                        </div>
+                                        <h4 className="text-sm font-bold text-slate-800 line-clamp-2 leading-tight group-hover:text-violet-700 relative z-10 flex-grow">{card.title}</h4>
+                                    </a>
+                                ))
+                            ) : (
+                                <div className="col-span-full flex flex-col items-center justify-center py-12 text-center text-slate-300">
+                                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm border border-slate-100">
+                                        <FileSignature size={24} />
+                                    </div>
+                                    <p className="text-sm font-bold uppercase tracking-widest leading-relaxed">No Formula Sheets</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </Card>
         </div>

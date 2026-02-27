@@ -1034,6 +1034,20 @@ export const getEducatorVideos = async (educatorId: string): Promise<EducatorVid
     }
 };
 
+export const getAllEducatorVideos = async (): Promise<EducatorVideo[]> => {
+    if (!isAppwriteConfigured()) return [];
+    try {
+        const response = await databases.listDocuments(DB_ID, 'educator_videos', [
+            Query.orderDesc('createdAt'),
+            Query.limit(20) // Limit for dashboard performance
+        ]);
+        return response.documents.map(doc => ({ id: doc.$id, ...doc })) as unknown as EducatorVideo[];
+    } catch (error) {
+        console.error("Error fetching all educator videos:", error);
+        return [];
+    }
+};
+
 export const createEducatorVideo = async (video: Omit<EducatorVideo, "id">) => {
     try {
         await databases.createDocument(DB_ID, 'educator_videos', ID.unique(), video);
