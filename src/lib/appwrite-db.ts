@@ -1221,26 +1221,93 @@ const updateUserAnalytics = async (userId: string, updates: {
 export const getAllUserAnalytics = async (): Promise<UserAnalytics[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
-        const response = await databases.listDocuments(DB_ID, 'user_analytics', [
-            Query.orderDesc('lastActive'),
+        // 1. Fetch all users
+        const usersResponse = await databases.listDocuments(DB_ID, 'users', [
             Query.limit(5000)
         ]);
+        const users = usersResponse.documents;
 
-        const users = await databases.listDocuments(DB_ID, 'users', [Query.limit(5000)]);
-        const userMap = new Map(users.documents.map(u => [u.$id, u]));
+        // 2. Fetch all test results
+        const resultsResponse = await databases.listDocuments(DB_ID, 'test-results', [
+            Query.limit(5000),
+            Query.orderDesc('completedAt')
+        ]);
+        const allResults = resultsResponse.documents;
 
-        return response.documents.map(doc => {
-            // Try to merge actual user email/name if needed, or rely on a separate join in UI
-            // For now just return analytics data
+        // 3. Group test results by userId
+        const resultsByUser = new Map<string, any[]>();
+        allResults.forEach((doc: any) => {
+            const arr = resultsByUser.get(doc.userId) || [];
+            arr.push(doc);
+            resultsByUser.set(doc.userId, arr);
+        });
+
+        // 4. Also try to fetch from user_analytics for any existing tracking data
+        let analyticsMap = new Map<string, any>();
+        try {
+            const analyticsResponse = await databases.listDocuments(DB_ID, 'user_analytics', [
+                Query.limit(5000)
+            ]);
+            analyticsResponse.documents.forEach((doc: any) => {
+                analyticsMap.set(doc.userId, doc);
+            });
+        } catch (e) {
+            // user_analytics collection might not exist, that's okay
+        }
+
+        // 5. Build analytics for each user
+        const analytics: UserAnalytics[] = users.map((user: any) => {
+            const userId = user.$id;
+            const userResults = resultsByUser.get(userId) || [];
+            const existingAnalytics = analyticsMap.get(userId);
+
+            // Test count (deduplicated by testId — count unique tests taken)
+            const uniqueTests = new Set(userResults.map((r: any) => r.testId));
+            const testsAttempted = uniqueTests.size;
+
+            // Total time spent on tests (sum of timeTaken from all results)
+            const totalTime = userResults.reduce((sum: number, r: any) => {
+                return sum + extractNumber(r.timeTaken);
+            }, 0);
+
+            // Last active: most recent test completedAt, or user creation time
+            const lastActive = userResults.length > 0
+                ? Math.max(...userResults.map((r: any) => extractNumber(r.completedAt)))
+                : extractNumber(user.$createdAt ? Math.floor(new Date(user.$createdAt).getTime() / 1000) : 0);
+
+            // Sessions: each test attempt counts as a session
+            const sessions = userResults.length;
+
+            // Engagement level: based on tests and time
+            const engagementLevel = calculateEngagement(totalTime, sessions);
+
+            // Most used feature
+            const mostUsedFeature = testsAttempted > 0 ? 'Mock Tests' : 'General';
+
+            // Merge with existing analytics data if any (prefer real tracking data)
+            const mergedTotalTime = existingAnalytics ? Math.max(extractNumber(existingAnalytics.totalTime), totalTime) : totalTime;
+            const mergedSessions = existingAnalytics ? Math.max(extractNumber(existingAnalytics.sessions), sessions) : sessions;
+            const mergedLastActive = existingAnalytics ? Math.max(extractNumber(existingAnalytics.lastActive), lastActive) : lastActive;
+            const mergedTests = existingAnalytics ? Math.max(extractNumber(existingAnalytics.testsAttempted), testsAttempted) : testsAttempted;
+
             return {
-                id: doc.$id,
-                ...doc,
-                totalTime: extractNumber(doc.totalTime),
-                lastActive: extractNumber(doc.lastActive),
-                sessions: extractNumber(doc.sessions),
-                testsAttempted: extractNumber(doc.testsAttempted)
-            };
-        }) as unknown as UserAnalytics[];
+                userId,
+                totalTime: mergedTotalTime,
+                lastActive: mergedLastActive,
+                mostUsedFeature: existingAnalytics?.mostUsedFeature || mostUsedFeature,
+                testsAttempted: mergedTests,
+                engagementLevel: calculateEngagement(mergedTotalTime, mergedSessions),
+                sessions: mergedSessions,
+                // Extra fields for the UI
+                email: user.email || '',
+                displayName: user.displayName || user.email?.split('@')[0] || 'Unknown',
+            } as UserAnalytics;
+        });
+
+        // Sort by last active (most recent first), filter out users with no activity
+        return analytics
+            .filter(a => a.testsAttempted > 0 || a.sessions > 0)
+            .sort((a, b) => b.lastActive - a.lastActive);
     } catch (error) {
         console.error("Error fetching all analytics", error);
         return [];

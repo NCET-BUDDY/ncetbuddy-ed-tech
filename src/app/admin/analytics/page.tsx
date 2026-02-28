@@ -101,7 +101,7 @@ export default function AnalyticsPage() {
                     <table className="w-full text-left border-collapse">
                         <thead>
                             <tr className="bg-gray-100/50 border-b-2 border-black text-xs uppercase tracking-wider font-black text-gray-600">
-                                <th className="p-4 cursor-pointer hover:bg-gray-200" onClick={() => handleSort('userId')}>User ID</th>
+                                <th className="p-4 cursor-pointer hover:bg-gray-200" onClick={() => handleSort('userId')}>Student</th>
                                 <th className="p-4 cursor-pointer hover:bg-gray-200" onClick={() => handleSort('lastActive')}>Last Active {sortField === 'lastActive' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                                 <th className="p-4 cursor-pointer hover:bg-gray-200" onClick={() => handleSort('totalTime')}>Total Time {sortField === 'totalTime' && (sortDir === 'asc' ? '↑' : '↓')}</th>
                                 <th className="p-4 cursor-pointer hover:bg-gray-200" onClick={() => handleSort('sessions')}>Sessions {sortField === 'sessions' && (sortDir === 'asc' ? '↑' : '↓')}</th>
@@ -112,7 +112,10 @@ export default function AnalyticsPage() {
                         <tbody className="divide-y divide-gray-200">
                             {sortedAnalytics.map((user) => (
                                 <tr key={user.userId} className="hover:bg-primary/5 transition-colors">
-                                    <td className="p-4 font-mono text-xs">{user.userId}</td>
+                                    <td className="p-4">
+                                        <div className="font-bold text-sm">{(user as any).displayName || 'Unknown'}</div>
+                                        <div className="text-xs text-gray-400">{(user as any).email || user.userId}</div>
+                                    </td>
                                     <td className="p-4 font-medium">{formatDate(user.lastActive)}</td>
                                     <td className="p-4 font-bold text-blue-600">{formatTime(user.totalTime)}</td>
                                     <td className="p-4">{user.sessions}</td>
