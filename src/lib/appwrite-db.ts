@@ -67,6 +67,7 @@ export const getTests = async (): Promise<Test[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
         const response = await databases.listDocuments(DB_ID, 'tests', [
+            Query.limit(5000),
             Query.orderDesc('createdAt')
         ]);
         return response.documents.map(doc => {
@@ -573,6 +574,7 @@ export const getBooks = async (): Promise<Book[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
         const response = await databases.listDocuments(DB_ID, 'books', [
+            Query.limit(5000),
             Query.orderDesc('createdAt')
         ]);
         return response.documents.map(doc => ({ id: doc.$id, ...doc })) as unknown as Book[];
@@ -614,6 +616,7 @@ export const getFormulaCards = async (): Promise<FormulaCard[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
         const response = await databases.listDocuments(DB_ID, 'formula_cards', [
+            Query.limit(5000),
             Query.orderDesc('createdAt')
         ]);
         return response.documents.map(doc => ({ id: doc.$id, ...doc })) as unknown as FormulaCard[];
@@ -655,6 +658,7 @@ export const getPYQs = async (): Promise<PYQ[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
         const response = await databases.listDocuments(DB_ID, 'pyqs', [
+            Query.limit(5000),
             Query.orderDesc('year')
         ]);
         return response.documents.map(doc => ({ id: doc.$id, ...doc })) as unknown as PYQ[];
@@ -686,7 +690,10 @@ export const deletePYQ = async (id: string) => {
 export const getUsers = async (): Promise<UserProfile[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
-        const response = await databases.listDocuments(DB_ID, 'users');
+        const response = await databases.listDocuments(DB_ID, 'users', [
+            Query.limit(5000),
+            Query.orderDesc('$createdAt')
+        ]);
         return response.documents.map(doc => ({ uid: doc.$id, ...doc })) as unknown as UserProfile[];
     } catch (error) {
         console.error("Error fetching users:", error);
@@ -719,6 +726,7 @@ export const getNotifications = async (): Promise<Notification[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
         const response = await databases.listDocuments(DB_ID, 'notifications', [
+            Query.limit(5000),
             Query.orderDesc('createdAt')
         ]);
         return response.documents.map(doc => ({ id: doc.$id, ...doc })) as unknown as Notification[];
@@ -780,6 +788,7 @@ export const getVideoClasses = async (): Promise<VideoClass[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
         const response = await databases.listDocuments(DB_ID, 'videos', [
+            Query.limit(5000),
             Query.orderDesc('createdAt')
         ]);
         return response.documents.map(doc => ({ id: doc.$id, ...doc })) as unknown as VideoClass[];
