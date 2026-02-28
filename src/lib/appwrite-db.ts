@@ -1223,10 +1223,10 @@ export const getAllUserAnalytics = async (): Promise<UserAnalytics[]> => {
     try {
         const response = await databases.listDocuments(DB_ID, 'user_analytics', [
             Query.orderDesc('lastActive'),
-            Query.limit(100) // Limit to 100 for now
+            Query.limit(5000)
         ]);
 
-        const users = await databases.listDocuments(DB_ID, 'users', [Query.limit(100)]);
+        const users = await databases.listDocuments(DB_ID, 'users', [Query.limit(5000)]);
         const userMap = new Map(users.documents.map(u => [u.$id, u]));
 
         return response.documents.map(doc => {
