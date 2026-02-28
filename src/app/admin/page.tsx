@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getTests, getBooks, getUsers, getUserPurchases } from "@/lib/appwrite-db";
+import { getTests, getBooks, getUsers, getUserPurchases, getActiveUsersCount } from "@/lib/appwrite-db";
 import { databases, DB_ID } from "@/lib/server/appwrite-admin";
 import { Purchase } from "@/types";
 import { BookOpen, ClipboardList, Users, Bell } from "lucide-react";
@@ -23,10 +23,11 @@ export default function AdminDashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const [tests, books, users] = await Promise.all([
+                const [tests, books, users, activeCount] = await Promise.all([
                     getTests(),
                     getBooks(),
-                    getUsers()
+                    getUsers(),
+                    getActiveUsersCount()
                 ]);
 
                 // Fetch all purchases for analytics (client-side can't query all, so we make API call)
@@ -40,7 +41,7 @@ export default function AdminDashboard() {
                     users: users.length,
                     tests: tests.length,
                     books: books.length,
-                    activeUsers: Math.floor(users.length * 0.4), // Mock active users as 40% of total
+                    activeUsers: activeCount,
                     totalRevenue: totalRevenue,
                     totalTransactions: completedPurchases.length
                 });

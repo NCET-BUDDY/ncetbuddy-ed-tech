@@ -4,10 +4,10 @@ import { Query } from "node-appwrite";
 
 export async function GET(request: NextRequest) {
     try {
-        // Fetch all purchases (limit to last 100 for performance)
+        // Fetch all purchases (limit to 5000 for analytics aggregation)
         const response = await databases.listDocuments(DB_ID, 'purchases', [
             Query.orderDesc('createdAt'),
-            Query.limit(100)
+            Query.limit(5000)
         ]);
 
         return NextResponse.json(response.documents);

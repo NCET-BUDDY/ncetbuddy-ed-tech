@@ -1247,6 +1247,21 @@ export const getAllUserAnalytics = async (): Promise<UserAnalytics[]> => {
     }
 }
 
+export const getActiveUsersCount = async (): Promise<number> => {
+    if (!isAppwriteConfigured()) return 0;
+    try {
+        const oneDayAgo = Math.floor(Date.now() / 1000) - (24 * 60 * 60);
+        const response = await databases.listDocuments(DB_ID, 'user_analytics', [
+            Query.limit(5000),
+            Query.greaterThanEqual('lastActive', oneDayAgo)
+        ]);
+        return response.total; // Appwrite returns a 'total' property we can use even if we don't need the docs
+    } catch (error) {
+        console.error("Error fetching active users count", error);
+        return 0;
+    }
+}
+
 // Legacy alias for backward compatibility
 export type TestLeaderboardEntry = TestRankEntry;
 
