@@ -7,16 +7,38 @@ import { MapPin, GraduationCap, Building2, Search } from 'lucide-react';
 
 export default function CollegesPage() {
     const colleges = [
-        { name: "IIT Madras", location: "Chennai, Tamil Nadu", type: "IIT" },
+        // IITs
         { name: "IIT Kharagpur", location: "Kharagpur, West Bengal", type: "IIT" },
-        { name: "NIT Trichy", location: "Tiruchirappalli, Tamil Nadu", type: "NIT" },
-        { name: "NIT Warangal", location: "Warangal, Telangana", type: "NIT" },
-        { name: "RIE Bhubaneswar", location: "Bhubaneswar, Odisha", type: "RIE" },
-        { name: "RIE Mysore", location: "Mysuru, Karnataka", type: "RIE" },
-        { name: "RIE Ajmer", location: "Ajmer, Rajasthan", type: "RIE" },
+        { name: "IIT Bhubaneswar", location: "Bhubaneswar, Odisha", type: "IIT" },
+        { name: "IIT Ropar", location: "Rupnagar, Punjab", type: "IIT" },
+        { name: "IIT Jodhpur", location: "Jodhpur, Rajasthan", type: "IIT" },
+        { name: "IIT (ISM) Dhanbad", location: "Dhanbad, Jharkhand", type: "IIT" },
+
+        // NITs
+        { name: "NIT Tiruchirappalli", location: "Tiruchirappalli, Tamil Nadu", type: "NIT" },
+        { name: "NIT Calicut", location: "Calicut, Kerala", type: "NIT" },
+        { name: "NIT Jalandhar", location: "Jalandhar, Punjab", type: "NIT" },
+        { name: "NIT Agartala", location: "Agartala, Tripura", type: "NIT" },
+        { name: "NIT Puducherry", location: "Karaikal, Puducherry", type: "NIT" },
+
+        // RIEs
         { name: "RIE Bhopal", location: "Bhopal, Madhya Pradesh", type: "RIE" },
+        { name: "RIE Ajmer", location: "Ajmer, Rajasthan", type: "RIE" },
+        { name: "RIE Bhubaneswar", location: "Bhubaneswar, Odisha", type: "RIE" },
+        { name: "RIE Mysuru", location: "Mysuru, Karnataka", type: "RIE" },
+
+        // Other Major Government Institutes
+        { name: "IGNOU", location: "New Delhi, Delhi", type: "Central Univ" },
+        { name: "Aligarh Muslim University", location: "Aligarh, Uttar Pradesh", type: "Central Univ" },
+        { name: "Chaudhary Devi Lal University", location: "Sirsa, Haryana", type: "State Univ" },
+        { name: "Guru Nanak Dev University", location: "Amritsar, Punjab", type: "State Univ" },
+        { name: "HNB Garhwal University", location: "Srinagar, Uttarakhand", type: "Central Univ" },
+        { name: "Gautam Buddha University", location: "Greater Noida, Uttar Pradesh", type: "State Univ" },
+        { name: "Bundelkhand University", location: "Jhansi, Uttar Pradesh", type: "State Univ" },
         { name: "Central University of Haryana", location: "Mahendergarh, Haryana", type: "Central Univ" },
-        { name: "Central University of Rajasthan", location: "Ajmer, Rajasthan", type: "Central Univ" },
+        { name: "Maharshi Dayanand University", location: "Rohtak, Haryana", type: "State Univ" },
+        { name: "Kumaun University", location: "Nainital, Uttarakhand", type: "State Univ" },
+        { name: "Central University of Kashmir", location: "Ganderbal, J&K", type: "Central Univ" },
     ];
 
     return (
