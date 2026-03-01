@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { getBanners, createBanner, updateBanner, deleteBanner } from "@/lib/appwrite-db";
 import { CarouselBanner } from "@/types";
-import { Trash2, Eye, EyeOff, Plus, Link as LinkIcon, Image as ImageIcon } from "lucide-react";
+import { Trash2, Eye, EyeOff, Plus, Link as LinkIcon, Image as ImageIcon, Upload, X } from "lucide-react";
 
 export default function BannerManagementPage() {
     const [banners, setBanners] = useState<CarouselBanner[]>([]);
@@ -15,6 +15,9 @@ export default function BannerManagementPage() {
     const [imageUrl, setImageUrl] = useState("");
     const [linkUrl, setLinkUrl] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadMode, setUploadMode] = useState<"url" | "file">("url");
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         fetchBanners();
@@ -46,6 +49,48 @@ export default function BannerManagementPage() {
         }
 
         return url;
+    };
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('/api/admin/banners/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Upload failed');
+            }
+
+            const data = await response.json();
+            setImageUrl(data.url);
+            alert('Image uploaded successfully!');
+        } catch (error: any) {
+            console.error('Error uploading file:', error);
+            alert(error.message || 'Failed to upload image. Make sure the banners bucket exists in Appwrite.');
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
+    };
+
+    const handleClearImage = () => {
+        setImageUrl("");
     };
 
     const handleCreateBanner = async () => {
@@ -114,21 +159,117 @@ export default function BannerManagementPage() {
                         onChange={(e) => setTitle(e.target.value)}
                     />
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "1rem", alignItems: "end" }}>
-                        <Input
-                            label="Google Drive Link (Sharing URL)"
-                            placeholder="https://drive.google.com/file/d/..."
-                            value={imageUrl}
-                            onChange={(e) => setImageUrl(e.target.value)}
-                        />
-                        {imageUrl && (
-                            <div style={{ marginBottom: "0.5rem" }}>
-                                <img
-                                    src={convertToDirectLink(imageUrl)}
-                                    alt="Preview"
-                                    style={{ width: "100px", height: "40px", objectCover: "cover", borderRadius: "4px", border: "1px solid var(--border)" }}
-                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                    <div>
+                        <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.75rem" }}>
+                            <Button
+                                type="button"
+                                onClick={() => setUploadMode("url")}
+                                style={{
+                                    padding: "0.5rem 1rem",
+                                    background: uploadMode === "url" ? "var(--primary)" : "var(--surface)",
+                                    color: uploadMode === "url" ? "white" : "var(--text-primary)",
+                                    border: "1px solid var(--border)"
+                                }}
+                            >
+                                <LinkIcon size={14} style={{ marginRight: "0.25rem" }} />
+                                Google Drive URL
+                            </Button>
+                            <Button
+                                type="button"
+                                onClick={() => setUploadMode("file")}
+                                style={{
+                                    padding: "0.5rem 1rem",
+                                    background: uploadMode === "file" ? "var(--primary)" : "var(--surface)",
+                                    color: uploadMode === "file" ? "white" : "var(--text-primary)",
+                                    border: "1px solid var(--border)"
+                                }}
+                            >
+                                <Upload size={14} style={{ marginRight: "0.25rem" }} />
+                                Upload File
+                            </Button>
+                        </div>
+
+                        {uploadMode === "url" ? (
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "1rem", alignItems: "end" }}>
+                                <Input
+                                    label="Google Drive Link (Sharing URL)"
+                                    placeholder="https://drive.google.com/file/d/..."
+                                    value={imageUrl}
+                                    onChange={(e) => setImageUrl(e.target.value)}
                                 />
+                                {imageUrl && (
+                                    <div style={{ marginBottom: "0.5rem" }}>
+                                        <img
+                                            src={convertToDirectLink(imageUrl)}
+                                            alt="Preview"
+                                            style={{ width: "100px", height: "40px", objectFit: "cover", borderRadius: "4px", border: "1px solid var(--border)" }}
+                                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileUpload}
+                                    style={{ display: "none" }}
+                                    id="banner-file-upload"
+                                />
+                                <label htmlFor="banner-file-upload">
+                                    <div
+                                        style={{
+                                            border: "2px dashed var(--border)",
+                                            borderRadius: "8px",
+                                            padding: "2rem",
+                                            textAlign: "center",
+                                            cursor: "pointer",
+                                            background: "var(--surface)",
+                                            transition: "border-color 0.2s"
+                                        }}
+                                    >
+                                        {isUploading ? (
+                                            <p>Uploading...</p>
+                                        ) : imageUrl ? (
+                                            <div style={{ position: "relative", display: "inline-block" }}>
+                                                <img
+                                                    src={imageUrl}
+                                                    alt="Preview"
+                                                    style={{ maxWidth: "200px", maxHeight: "100px", borderRadius: "4px", border: "1px solid var(--border)" }}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => { e.preventDefault(); handleClearImage(); }}
+                                                    style={{
+                                                        position: "absolute",
+                                                        top: "-8px",
+                                                        right: "-8px",
+                                                        background: "red",
+                                                        color: "white",
+                                                        border: "none",
+                                                        borderRadius: "50%",
+                                                        width: "20px",
+                                                        height: "20px",
+                                                        cursor: "pointer",
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center"
+                                                    }}
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <Upload size={32} style={{ color: "var(--text-secondary)", marginBottom: "0.5rem" }} />
+                                                <p style={{ color: "var(--text-secondary)" }}>Click to upload an image</p>
+                                                <p style={{ color: "var(--text-secondary)", fontSize: "0.8rem" }}>PNG, JPG, GIF up to 10MB</p>
+                                            </>
+                                        )}
+                                    </div>
+                                </label>
                             </div>
                         )}
                     </div>
