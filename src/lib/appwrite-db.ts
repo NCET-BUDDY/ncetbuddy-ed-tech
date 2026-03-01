@@ -536,7 +536,7 @@ export const getDynamicPlannerTask = async (userId: string): Promise<PlannerTask
             return {
                 title: "Review Foundational Concepts",
                 subtitle: `Scored ${Math.round(percentage)}% recently - Need revision!`,
-                actionText: "Watch Lectures",
+                actionText: "Mark as Done",
                 actionUrl: "/learning",
                 progress: dailyPercent
             };
