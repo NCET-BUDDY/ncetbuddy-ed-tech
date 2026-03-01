@@ -545,7 +545,7 @@ export const getDynamicPlannerTask = async (userId: string, completedTasks: stri
                 title: "Practice Weak Sections",
                 subtitle: "Solidify your understanding",
                 actionText: "Explore PYQs",
-                actionUrl: "/dashboard/tests/pyq",
+                actionUrl: "/dashboard/tests",
                 progress: dailyPercent
             };
         } else {
