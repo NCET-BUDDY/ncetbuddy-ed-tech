@@ -159,7 +159,14 @@ export const CommunityDiscussion = ({ posts }: { posts: any[] }) => {
 // --- AI Smart Planner Section ---
 import { PlannerTask } from '@/lib/appwrite-db';
 
-export const AISmartPlanner = ({ task }: { task: PlannerTask }) => {
+export const AISmartPlanner = ({ task, onComplete }: { task: PlannerTask, onComplete?: () => void }) => {
+    const handleAction = (e: React.MouseEvent) => {
+        if (task.actionText === "Mark as Done" && onComplete) {
+            e.preventDefault();
+            onComplete();
+        }
+    };
+
     return (
         <Card className="bg-white border-slate-100 shadow-sm p-6 rounded-3xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 text-rose-500/10 group-hover:scale-110 transition-transform">
@@ -196,7 +203,7 @@ export const AISmartPlanner = ({ task }: { task: PlannerTask }) => {
                     </div>
                 </div>
 
-                <Link href={task.actionUrl} className="shrink-0">
+                <Link href={task.actionUrl} className="shrink-0" onClick={handleAction}>
                     <Button className="bg-rose-500 hover:bg-rose-600 text-white font-black rounded-xl px-4 py-6 shadow-lg shadow-rose-500/20 active:translate-y-0.5 transition-all text-[11px] uppercase tracking-tighter flex items-center gap-2">
                         <CheckCircle2 size={14} /> {task.actionText}
                     </Button>

@@ -505,7 +505,7 @@ export interface PlannerTask {
     progress: number;
 }
 
-export const getDynamicPlannerTask = async (userId: string): Promise<PlannerTask> => {
+export const getDynamicPlannerTask = async (userId: string, completedTasks: string[] = []): Promise<PlannerTask> => {
     try {
         const results = await getUserTestResults(userId);
 
@@ -532,7 +532,7 @@ export const getDynamicPlannerTask = async (userId: string): Promise<PlannerTask
         }
 
         // Generate dynamic task based on latest percentage
-        if (percentage < 40) {
+        if (percentage < 40 && !completedTasks.includes("Review Foundational Concepts")) {
             return {
                 title: "Review Foundational Concepts",
                 subtitle: `Scored ${Math.round(percentage)}% recently - Need revision!`,
@@ -540,7 +540,7 @@ export const getDynamicPlannerTask = async (userId: string): Promise<PlannerTask
                 actionUrl: "/learning",
                 progress: dailyPercent
             };
-        } else if (percentage >= 40 && percentage < 75) {
+        } else if ((percentage < 75 || completedTasks.includes("Review Foundational Concepts")) && !completedTasks.includes("Practice Weak Sections")) {
             return {
                 title: "Practice Weak Sections",
                 subtitle: "Solidify your understanding",
@@ -566,6 +566,31 @@ export const getDynamicPlannerTask = async (userId: string): Promise<PlannerTask
             actionUrl: "/dashboard/tests",
             progress: 0
         };
+    }
+};
+
+export const markTaskDone = async (userId: string, taskTitle: string) => {
+    if (typeof window !== 'undefined') {
+        const key = `completed_tasks_${userId}`;
+        const stored = localStorage.getItem(key);
+        const completed = stored ? JSON.parse(stored) : [];
+        if (!completed.includes(taskTitle)) {
+            completed.push(taskTitle);
+            localStorage.setItem(key, JSON.stringify(completed));
+        }
+    }
+
+    // Log event for backend tracking if configured
+    if (isAppwriteConfigured()) {
+        try {
+            await logUserEvent({
+                userId: userId,
+                eventType: 'other',
+                metadata: JSON.stringify({ action: 'planner_task_complete', taskTitle })
+            });
+        } catch (e) {
+            console.error("Failed to log planner task completion:", e);
+        }
     }
 };
 

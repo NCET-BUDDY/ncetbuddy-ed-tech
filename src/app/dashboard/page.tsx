@@ -3,7 +3,7 @@
 import React from 'react';
 import BannerCarousel from '@/components/dashboard/BannerCarousel';
 import { useEffect, useState } from 'react';
-import { getBooks, getFormulaCards, getTests, getForumPosts, getDailyProgress, getUserTestResults, getDynamicPlannerTask, PlannerTask, getVideoClasses } from '@/lib/appwrite-db';
+import { getBooks, getFormulaCards, getTests, getForumPosts, getDailyProgress, getUserTestResults, getDynamicPlannerTask, PlannerTask, getVideoClasses, markTaskDone } from '@/lib/appwrite-db';
 import { Test, ForumPost, Book, FormulaCard, VideoClass } from '@/types';
 import {
     MockTestEngine,
@@ -109,7 +109,10 @@ export default function DashboardPage() {
 
                 // Fetch Planner Data (Dynamic based on test results)
                 if (user?.$id) {
-                    const dynamicTask = await getDynamicPlannerTask(user.$id);
+                    const key = `completed_tasks_${user.$id}`;
+                    const stored = localStorage.getItem(key);
+                    const completed = stored ? JSON.parse(stored) : [];
+                    const dynamicTask = await getDynamicPlannerTask(user.$id, completed);
                     setPlannerData(dynamicTask);
 
                     // Fetch Performance Analytics
@@ -205,7 +208,20 @@ export default function DashboardPage() {
                         <MockTestEngine tests={tests} />
 
                         {/* AI Smart Planner */}
-                        <AISmartPlanner task={plannerData} />
+                        <AISmartPlanner
+                            task={plannerData}
+                            onComplete={async () => {
+                                if (user?.$id) {
+                                    await markTaskDone(user.$id, plannerData.title);
+                                    // Refresh task
+                                    const key = `completed_tasks_${user.$id}`;
+                                    const stored = localStorage.getItem(key);
+                                    const completed = stored ? JSON.parse(stored) : [];
+                                    const newTask = await getDynamicPlannerTask(user.$id, completed);
+                                    setPlannerData(newTask);
+                                }
+                            }}
+                        />
 
                         {/* Resource Library */}
                         <ResourceLibrary books={books} formulaCards={formulaCards} videos={videos} />
