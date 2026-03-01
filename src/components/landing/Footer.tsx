@@ -68,7 +68,7 @@ export const Footer = () => {
 
                 <div className="py-12 text-center">
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white" style={{ fontFamily: "Dancing Script, cursive" }}>
-                        NCET Bole to NCETBuddy
+                        #The Best Platform for NCET Prep.
                         <span className="block w-32 h-1 bg-[#E11D48] mx-auto mt-3"></span>
                     </h2>
                 </div>
