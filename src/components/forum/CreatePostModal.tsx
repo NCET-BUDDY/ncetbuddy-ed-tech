@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 import { createForumPost } from "@/lib/appwrite-db";
 import { useAuth } from "@/context/AuthContext";
 
@@ -69,13 +70,14 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
                                         key={cat}
                                         type="button"
                                         onClick={() => setCategory(cat)}
-                                        className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider border-2 transition-all
+                                        className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider border-2 transition-all flex items-center gap-2
                                             ${category === cat
                                                 ? "bg-black text-white border-black transform -translate-y-1 shadow-[4px_4px_0px_0px_rgba(255,208,47,1)]"
                                                 : "bg-white text-black/40 border-black/10 hover:border-black hover:text-black"
                                             }`}
                                     >
                                         {cat}
+                                        {cat === 'Exam Update' && <Badge variant="admin" className="scale-75 origin-right">Official</Badge>}
                                     </button>
                                 ))}
                             </div>

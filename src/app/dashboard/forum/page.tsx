@@ -8,6 +8,8 @@ import { ForumPost, ForumComment } from "@/types";
 import { CreatePostModal } from "@/components/forum/CreatePostModal";
 import { Plus, Search, Flame, Smile, Paperclip, Mic, MessageCircle, Lock, ArrowLeft } from "lucide-react";
 import Image from "next/image";
+import { Badge } from "@/components/ui/Badge";
+
 
 // Extended type for UI specific fields if needed
 interface UIForumPost extends ForumPost {
@@ -185,8 +187,10 @@ export default function ForumPage() {
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center">
-                                        <p className="text-gray-600 text-sm truncate pr-2">
-                                            <span className="font-semibold text-gray-800 mr-1">{post.authorName}:</span>
+                                        <p className="text-gray-600 text-sm truncate pr-2 flex items-center gap-1">
+                                            <span className="font-semibold text-gray-800">{post.authorName}</span>
+                                            {post.category === 'Exam Update' && <Badge variant="admin" className="scale-[0.8] origin-left">Admin</Badge>}
+                                            <span className="mx-1 text-gray-400">:</span>
                                             {post.content}
                                         </p>
                                         {post.isHot && (
@@ -228,7 +232,10 @@ export default function ForumPage() {
                                 </div>
 
                                 <div className="flex flex-col cursor-pointer">
-                                    <span className="text-gray-900 font-medium line-clamp-1">{selectedPost.title}</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-gray-900 font-medium line-clamp-1">{selectedPost.title}</span>
+                                        {selectedPost.category === 'Exam Update' && <Badge variant="admin">Verified Admin</Badge>}
+                                    </div>
                                     <span className="text-xs text-gray-500">
                                         {selectedPost.authorName} • {selectedPost.category}
                                     </span>
@@ -253,8 +260,13 @@ export default function ForumPage() {
 
                             {/* The Original Post (as the first message) */}
                             <div className="flex flex-col space-y-1 max-w-[85%] md:max-w-[70%]">
-                                <div className={`px-4 py-2 rounded-lg shadow-sm bg-white text-gray-900 rounded-tl-none`}>
-                                    <div className="font-bold text-sm text-[#d97c2e] mb-1">{selectedPost.authorName}</div>
+                                <div className={`px-4 py-2 rounded-lg shadow-sm text-gray-900 rounded-tl-none
+                                    ${selectedPost.category === 'Exam Update' ? 'bg-blue-50 border-l-4 border-blue-400' : 'bg-white'}
+                                `}>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <div className="font-bold text-sm text-[#d97c2e]">{selectedPost.authorName}</div>
+                                        {selectedPost.category === 'Exam Update' && <Badge variant="admin" className="scale-75 origin-left">Admin</Badge>}
+                                    </div>
                                     <div className="whitespace-pre-wrap break-words text-sm md:text-base">
                                         {selectedPost.content}
                                     </div>
@@ -272,11 +284,18 @@ export default function ForumPage() {
                                         <div className={`px-4 py-2 rounded-lg shadow-sm text-gray-900 break-words text-sm md:text-base
                                             ${isMe
                                                 ? 'bg-[#d9fdd3] rounded-tr-none'
-                                                : 'bg-white rounded-tl-none'
+                                                : comment.authorName === 'Admin' || comment.authorName.includes('Educator') || selectedPost.category === 'Exam Update'
+                                                    ? 'bg-blue-50 border-l-4 border-blue-400 rounded-tl-none'
+                                                    : 'bg-white rounded-tl-none'
                                             }
                                         `}>
                                             {!isMe && (
-                                                <div className="font-bold text-sm text-[#d97c2e] mb-1">{comment.authorName}</div>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <div className="font-bold text-sm text-[#d97c2e]">{comment.authorName}</div>
+                                                    {(comment.authorName === 'Admin' || selectedPost.category === 'Exam Update') && (
+                                                        <Badge variant="admin" className="scale-75 origin-left">Verified</Badge>
+                                                    )}
+                                                </div>
                                             )}
                                             <div className="whitespace-pre-wrap">{comment.content}</div>
                                             <div className="text-[10px] text-gray-500 text-right mt-1 flex justify-end items-center gap-1">
