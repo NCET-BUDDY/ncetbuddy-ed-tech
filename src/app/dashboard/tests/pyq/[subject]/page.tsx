@@ -57,7 +57,7 @@ export default function PYQSubjectPage() {
         <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <Link href="/dashboard/tests">
+                <Link href="/dashboard/pyqs">
                     <Button variant="secondary" className="bg-white border-2 border-black text-black hover:bg-black hover:text-white">
                         ← Back
                     </Button>

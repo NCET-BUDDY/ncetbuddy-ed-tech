@@ -7,12 +7,15 @@ import { LatexRenderer } from "@/components/ui/LatexRenderer";
 import { useState } from "react";
 import { createTest } from "@/lib/appwrite-db";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Test, Question, PYQSubject } from "@/types";
 
 export default function CreateTestPage() {
     const { user } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const typeFromUrl = searchParams.get('type');
+
     const [loading, setLoading] = useState(false);
     const [testData, setTestData] = useState<Partial<Test>>({
         title: "",
@@ -20,7 +23,7 @@ export default function CreateTestPage() {
         duration: 60,
         subject: "General",
         questions: [],
-        testType: 'pyq', // Default to PYQ
+        testType: typeFromUrl === 'pyq' ? 'pyq' : (typeFromUrl === 'mock' ? 'educator' : 'pyq'), // Default to PYQ
         pyqSubject: 'non-domain', // Default PYQ subject
         price: 0, // Default free
         status: 'Published', // Default published
@@ -140,7 +143,7 @@ export default function CreateTestPage() {
 
         if (testId) {
             alert("Test published successfully!");
-            router.push("/admin/tests");
+            router.push(testData.testType === 'pyq' ? "/admin/pyqs" : "/admin/tests");
         } else {
             alert("Failed to publish test.");
         }

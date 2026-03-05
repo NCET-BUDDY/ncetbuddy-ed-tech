@@ -40,7 +40,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
     const navItems = [
         { href: "/dashboard", label: "Dashboard", icon: <Home size={20} /> },
-        { href: "/dashboard/tests", label: "Mock Tests", icon: <PenLine size={20} /> },
+        { href: "/dashboard/pyqs", label: "PYQs", icon: <PenLine size={20} /> },
+        { href: "/dashboard/tests", label: "Mock Tests", icon: <PlayCircle size={20} /> },
         { href: "/dashboard/notes", label: "Resources", icon: <BookOpen size={20} /> },
         { href: "/dashboard/forum", label: "Forum", icon: <MessageSquare size={20} /> },
     ];
