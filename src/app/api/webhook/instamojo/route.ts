@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createPaymentRecord } from "@/lib/appwrite-db";
+import { databases, DB_ID } from "@/lib/server/appwrite-admin";
+import { ID } from "node-appwrite";
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
@@ -57,11 +59,13 @@ export async function POST(request: NextRequest) {
         // fallback to extracting from purpose if we structured it as "Product Name|userId"
         let userId = "UNKNOWN";
         let productName = purpose;
+        let affiliateId = null;
 
         if (purpose && purpose.includes("|")) {
             const parts = purpose.split("|");
             productName = parts[0];
             userId = parts[1];
+            if (parts.length > 2) affiliateId = parts[2];
         }
 
         // 3. Write securely to database
@@ -75,6 +79,25 @@ export async function POST(request: NextRequest) {
                 productName: productName,
                 createdAt: Math.floor(Date.now() / 1000)
             });
+
+            // 4. Handle Affiliate Commission
+            if (affiliateId && affiliateId !== userId) {
+                // 25% commission
+                const commission = amount * 0.25;
+                try {
+                    await databases.createDocument(DB_ID, 'affiliate_earnings', ID.unique(), {
+                        affiliateId: affiliateId,
+                        amount: commission,
+                        status: 'pending',
+                        referredUserId: userId,
+                        purchaseId: paymentId,
+                        createdAt: Math.floor(Date.now() / 1000)
+                    });
+                    console.log(`Earned ₹${commission} commission for affiliate ${affiliateId}`);
+                } catch (e) {
+                    console.error("Failed to record affiliate commission:", e);
+                }
+            }
         }
 
         return NextResponse.json({ success: true });

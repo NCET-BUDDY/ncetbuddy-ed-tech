@@ -3,6 +3,8 @@ import { Inter, Dancing_Script } from "next/font/google";
 import "./globals.css";
 import { AnalyticsProvider } from "@/context/AnalyticsContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { Suspense } from "react";
+import RefTracker from "@/components/RefTracker";
 
 const inter = Inter({ subsets: ["latin"] });
 const dancingScript = Dancing_Script({ subsets: ["latin"] });
@@ -22,6 +24,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <AnalyticsProvider>
+            <Suspense fallback={null}>
+              <RefTracker />
+            </Suspense>
             {children}
           </AnalyticsProvider>
         </AuthProvider>

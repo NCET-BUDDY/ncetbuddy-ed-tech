@@ -92,6 +92,21 @@ function EducatorTestsList() {
 
         setPurchasingId(test.id);
 
+        let affiliateId = undefined;
+        try {
+            const stored = localStorage.getItem('affiliate_ref');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (parsed.expiry > Date.now()) {
+                    affiliateId = parsed.id;
+                } else {
+                    localStorage.removeItem('affiliate_ref');
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+
         try {
             const res = await fetch('/api/create-payment', {
                 method: 'POST',
@@ -102,7 +117,8 @@ function EducatorTestsList() {
                     amount: test.price || 0,
                     userEmail: user.email,
                     userName: user.name,
-                    userPhone: user.phone || ''
+                    userPhone: user.phone || '',
+                    affiliateId
                 })
             });
 

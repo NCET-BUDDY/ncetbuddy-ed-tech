@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
     Home, PlayCircle, Radio, PenLine, CalendarDays, BarChart2,
-    Trophy, MessageCircle, UserCircle, Menu, X, Search, Bell, Settings, LogOut, BookOpen, MessageSquare
+    Trophy, MessageCircle, UserCircle, Menu, X, Search, Bell, Settings, LogOut, BookOpen, MessageSquare, IndianRupee
 } from "lucide-react";
 import Image from "next/image";
 import NotificationBell from "@/components/dashboard/NotificationBell";
@@ -44,6 +44,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         { href: "/dashboard/tests", label: "Mock Tests", icon: <PlayCircle size={20} /> },
         { href: "/dashboard/notes", label: "Resources", icon: <BookOpen size={20} /> },
         { href: "/dashboard/forum", label: "Forum", icon: <MessageSquare size={20} /> },
+        { href: "/dashboard/affiliate", label: "Refer & Earn", icon: <IndianRupee size={20} /> },
     ];
 
     const bottomItems = [
