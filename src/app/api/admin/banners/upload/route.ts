@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { storage, BANNER_BUCKET_ID } from '@/lib/server/appwrite-admin';
-import { ID, Permission, Role, InputFile } from 'node-appwrite';
+import { ID, Permission, Role } from 'node-appwrite';
+import { InputFile } from 'node-appwrite/file';
 
 // Helper to ensure bucket exists
 async function ensureBannerBucket() {
