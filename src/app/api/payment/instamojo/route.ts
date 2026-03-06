@@ -36,9 +36,11 @@ export async function POST(request: NextRequest) {
         if (!test.price || test.price <= 0) {
             // AUTOMATIC ENROLLMENT FOR FREE TESTS
             try {
-                await databases.createDocument(DB_ID, 'purchases', ID.unique(), {
+                const uniqueId = ID.unique();
+                await databases.createDocument(DB_ID, 'purchases', uniqueId, {
                     userId,
                     testId,
+                    paymentRequestId: `FREE-${uniqueId}`, // Required field in schema
                     amount: 0,
                     status: 'completed',
                     createdAt: Math.floor(Date.now() / 1000)
@@ -49,9 +51,12 @@ export async function POST(request: NextRequest) {
                     isFree: true,
                     message: "Test is free, access granted automatically."
                 });
-            } catch (dbError) {
+            } catch (dbError: any) {
                 console.error("Failed to create free purchase record:", dbError);
-                return NextResponse.json({ error: "Database error during auto-enrollment" }, { status: 500 });
+                return NextResponse.json({
+                    error: "Database error during auto-enrollment",
+                    details: dbError.message || dbError
+                }, { status: 500 });
             }
         }
 
