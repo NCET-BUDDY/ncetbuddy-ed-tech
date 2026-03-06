@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const INSTAMOJO_CLIENT_ID = process.env.INSTAMOJO_CLIENT_ID;
-const INSTAMOJO_CLIENT_SECRET = process.env.INSTAMOJO_CLIENT_SECRET;
-// The Direct API framework usually targets api.instamojo.com in prod, and test.instamojo.com in sandbox. 
-// Standard API version uses api/1.1/ but OAuth token generation uses /oauth2/token/
-const INSTAMOJO_BASE_URL = "https://api.instamojo.com";
+const INSTAMOJO_API_KEY = process.env.INSTAMOJO_API_KEY;
+const INSTAMOJO_AUTH_TOKEN = process.env.INSTAMOJO_AUTH_TOKEN;
+const INSTAMOJO_BASE_URL = "https://www.instamojo.com/api/1.1";
 
 export async function POST(request: NextRequest) {
     try {
@@ -18,36 +16,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Amount must be greater than 0" }, { status: 400 });
         }
 
-        // Validate Instamojo Config
-        if (!INSTAMOJO_CLIENT_ID || !INSTAMOJO_CLIENT_SECRET) {
+        if (!INSTAMOJO_API_KEY || !INSTAMOJO_AUTH_TOKEN) {
             console.error("Missing Instamojo Configuration");
             return NextResponse.json({
                 error: "Payment gateway not configured. Please contact administrator."
             }, { status: 500 });
         }
 
-        // --- STEP 1: Get OAuth Access Token ---
-        const tokenPayload = new URLSearchParams();
-        tokenPayload.append('grant_type', 'client_credentials');
-        tokenPayload.append('client_id', INSTAMOJO_CLIENT_ID);
-        tokenPayload.append('client_secret', INSTAMOJO_CLIENT_SECRET);
-
-        const tokenResponse = await fetch(`${INSTAMOJO_BASE_URL}/oauth2/token/`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: tokenPayload.toString()
-        });
-
-        const tokenData = await tokenResponse.json();
-
-        if (!tokenResponse.ok || !tokenData.access_token) {
-            console.error("Instamojo Auth Error:", tokenData);
-            return NextResponse.json({ error: "Failed to authenticate with payment gateway" }, { status: 500 });
-        }
-
-        const accessToken = tokenData.access_token;
-
-        // --- STEP 2: Create Payment Request ---
         const purposeString = `NCET Ready Test|${userId}`;
         const payload = new URLSearchParams();
         payload.append('purpose', purposeString);
@@ -64,11 +39,11 @@ export async function POST(request: NextRequest) {
         payload.append('send_email', 'False');
         payload.append('allow_repeated_payments', 'False');
 
-        // Note: For OAuth, the endpoint is usually /v2/payment_requests/
-        const paymentRequestResponse = await fetch(`${INSTAMOJO_BASE_URL}/v2/payment_requests/`, {
+        const paymentRequestResponse = await fetch(`${INSTAMOJO_BASE_URL}/payment-requests/`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
+                'X-Api-Key': INSTAMOJO_API_KEY,
+                'X-Auth-Token': INSTAMOJO_AUTH_TOKEN,
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: payload.toString()
@@ -76,8 +51,7 @@ export async function POST(request: NextRequest) {
 
         const data = await paymentRequestResponse.json();
 
-        // v2 API structural check
-        if (!paymentRequestResponse.ok || (!data.id && !data.payment_request?.id)) {
+        if (!paymentRequestResponse.ok || !data.success || !data.payment_request?.longurl) {
             console.error("Instamojo Error:", data);
             return NextResponse.json({
                 error: "Failed to create payment request",
@@ -85,11 +59,9 @@ export async function POST(request: NextRequest) {
             }, { status: 500 });
         }
 
-        const paymentRequest = data.payment_request;
-
         return NextResponse.json({
             success: true,
-            paymentUrl: paymentRequest.longurl
+            paymentUrl: data.payment_request.longurl
         });
 
     } catch (error: any) {
