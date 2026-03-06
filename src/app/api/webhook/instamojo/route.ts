@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { databases, DB_ID } from "@/lib/server/appwrite-admin";
-import { Query } from "node-appwrite";
+import { createPaymentRecord } from "@/lib/appwrite-db";
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
@@ -48,39 +47,34 @@ export async function POST(request: NextRequest) {
         // 2. Process Payment Status
         const paymentId = data.payment_id;
         const paymentRequestId = data.payment_request_id;
-        const status = data.status; // 'Credit'
+        const status = data.status; // 'Credit' or 'Failed'
+        const amount = parseFloat(data.amount);
+        const purpose = data.purpose; // E.g., "NCET Ready Test:USER_ID"
 
         console.log(`Webhook Received: Payment ${paymentId} for Request ${paymentRequestId} is ${status}`);
 
-        // 3. Find Purchase Record
-        const dbResponse = await databases.listDocuments(DB_ID, 'purchases', [
-            Query.equal('paymentRequestId', paymentRequestId),
-            Query.limit(1)
-        ]);
+        // We embed userId in the purpose string during creation to extract it safely here
+        // fallback to extracting from purpose if we structured it as "Product Name|userId"
+        let userId = "UNKNOWN";
+        let productName = purpose;
 
-        if (dbResponse.documents.length === 0) {
-            console.error(`Purchase not found for payment request: ${paymentRequestId}`);
-            return NextResponse.json({ error: "Purchase not found" }, { status: 404 });
+        if (purpose && purpose.includes("|")) {
+            const parts = purpose.split("|");
+            productName = parts[0];
+            userId = parts[1];
         }
 
-        const purchase = dbResponse.documents[0];
-
-        // 4. Update Database
+        // 3. Write securely to database
         if (status === 'Credit') {
-            // Only update if not already completed to avoid redundant writes
-            if (purchase.status !== 'completed') {
-                await databases.updateDocument(DB_ID, 'purchases', purchase.$id, {
-                    status: 'completed',
-                    paymentId: paymentId
-                });
-            }
-        } else {
-            if (purchase.status !== 'failed') {
-                await databases.updateDocument(DB_ID, 'purchases', purchase.$id, {
-                    status: 'failed',
-                    paymentId: paymentId
-                });
-            }
+            await createPaymentRecord({
+                userId: userId,
+                paymentId: paymentId,
+                paymentRequestId: paymentRequestId,
+                amount: amount,
+                status: status,
+                productName: productName,
+                createdAt: Math.floor(Date.now() / 1000)
+            });
         }
 
         return NextResponse.json({ success: true });

@@ -22,7 +22,7 @@ import { Card } from "@/components/ui/Card";
 import Link from "next/link";
 import { PYQSubject, Test, Purchase } from "@/types";
 import { useEffect, useState } from "react";
-import { getTests, getUserPurchases } from "@/lib/appwrite-db";
+import { getTests, hasUserPaidForProduct } from "@/lib/appwrite-db";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PenLine, BookOpen, Microscope, Briefcase, Target, GraduationCap, Users } from "lucide-react";
@@ -38,7 +38,7 @@ const PYQ_SUBJECTS: { id: PYQSubject; label: string; icon: React.ReactNode; desc
 function EducatorTestsList() {
     const { user } = useAuth();
     const [tests, setTests] = useState<Test[]>([]);
-    const [purchases, setPurchases] = useState<Purchase[]>([]);
+    const [hasPaid, setHasPaid] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
     const [purchasingId, setPurchasingId] = useState<string | null>(null);
     const router = useRouter();
@@ -55,8 +55,8 @@ function EducatorTestsList() {
                 setTests(premiumTests);
 
                 if (user) {
-                    const userPurchases = await getUserPurchases(user.$id);
-                    setPurchases(userPurchases);
+                    const isPaidForPremium = await hasUserPaidForProduct(user.$id, "NCET Ready Test");
+                    setHasPaid(isPaidForPremium);
                 }
             } catch (error) {
                 console.error("Failed to fetch aggregator data", error);
@@ -76,7 +76,7 @@ function EducatorTestsList() {
             // Remove params
             router.replace('/dashboard/tests');
             // Refresh purchases
-            if (user) getUserPurchases(user.$id).then(setPurchases);
+            if (user) hasUserPaidForProduct(user.$id, "NCET Ready Test").then(setHasPaid);
         } else if (success === 'false') {
             alert("Payment Failed. Please try again.");
             router.replace('/dashboard/tests');
@@ -93,12 +93,13 @@ function EducatorTestsList() {
         setPurchasingId(test.id);
 
         try {
-            const res = await fetch('/api/payment/instamojo', {
+            const res = await fetch('/api/create-payment', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     testId: test.id,
                     userId: user.$id,
+                    amount: test.price || 0,
                     userEmail: user.email,
                     userName: user.name,
                     userPhone: user.phone || ''
@@ -154,7 +155,7 @@ function EducatorTestsList() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tests.map(test => {
-                const isPurchased = purchases.some(p => p.testId === test.id && p.status === 'completed');
+                const isPurchased = hasPaid;
 
                 return (
                     <Card key={test.id} className="group hover:border-primary/50 transition-all duration-300 shadow-lg h-full flex flex-col">

@@ -1,0 +1,120 @@
+# Instamojo Payment Request API Integration
+
+Replace the existing scattered payment routes with a clean, spec-compliant Instamojo integration using the Payment Request API. The old routes used `purchases` collection and a callback redirect flow; the new design uses a dedicated `payments` collection and a dedicated success page.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **New Credentials Needed**: The existing [.env.local](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/.env.local) will have the old Instamojo credentials (`INSTAMOJO_API_KEY`, `INSTAMOJO_AUTH_TOKEN`, `INSTAMOJO_SALT`, `INSTAMOJO_ENDPOINT`) completely removed. You will need to provide your new credentials after the implementation. Placeholder variables will be added.
+
+> [!WARNING]
+> **Breaking Change — Old API Routes Removed**: The routes at `/api/payment/instamojo`, `/api/payment/callback`, and `/api/payment/webhook` will be deleted and replaced by `/api/create-payment`. The test purchase button already references the old route — that will be updated.
+
+> [!WARNING]
+> **New Appwrite Collection Required**: The spec requires saving payment data to a `payments` collection (distinct from the existing `purchases` collection). You must **manually create a `payments` collection** in your Appwrite console with these attributes:
+> - `userId` (String, required)
+> - `paymentId` (String, required)
+> - `paymentRequestId` (String, required)
+> - `amount` (Float, required)
+> - `status` (String, required)
+> - `productName` (String, required)
+> - `createdAt` (Integer, required)
+
+---
+
+## Proposed Changes
+
+### Environment Variables
+
+#### [MODIFY] [.env.local](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/.env.local)
+- Remove `INSTAMOJO_API_KEY`, `INSTAMOJO_AUTH_TOKEN`, `INSTAMOJO_SALT`, `INSTAMOJO_ENDPOINT` (old credentials)
+- Add fresh placeholder keys: `INSTAMOJO_API_KEY=`, `INSTAMOJO_AUTH_TOKEN=`
+- User to fill in new credentials after implementation
+
+---
+
+### Old Payment Routes (DELETE)
+
+#### [DELETE] [api/payment/instamojo/route.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/api/payment/instamojo/route.ts)
+#### [DELETE] [api/payment/callback/route.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/api/payment/callback/route.ts)
+#### [DELETE] [api/payment/webhook/route.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/api/payment/webhook/route.ts)
+
+---
+
+### New Payment API Route
+
+#### [NEW] [create-payment/route.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/api/create-payment/route.ts)
+- POST handler that accepts `{ testId, userId, amount, userName, userEmail, userPhone }`
+- Sends a POST to `https://test.instamojo.com/api/1.1/payment-requests/` with:
+  - `purpose: "NCET Ready Test"`
+  - `amount` from request body
+  - `redirect_url: https://www.ncetbuddy.in/payment-success`
+  - Headers: `X-Api-Key` and `X-Auth-Token` from env vars
+- Returns `{ success: true, paymentUrl: payment_request.longurl }`
+
+---
+
+### Types
+
+#### [MODIFY] [index.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/types/index.ts)
+- Add `productName?: string` field to the [Purchase](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/types/index.ts#33-43) interface
+- Add new [Payment](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/lib/appwrite-db.ts#888-902) interface with: `id, userId, paymentId, paymentRequestId, amount, status, productName, createdAt`
+
+---
+
+### Appwrite DB Layer
+
+#### [MODIFY] [appwrite-db.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/lib/appwrite-db.ts)
+- Add `createPaymentRecord(data)` function — writes to `payments` collection using admin SDK
+- Add `getUserPayments(userId)` function — queries `payments` collection for completed payments
+- Add `hasUserPaidForProduct(userId, productName)` — checks if payment exists for a product
+
+---
+
+### Payment Success Page
+
+#### [NEW] [payment-success/page.tsx](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/payment-success/page.tsx)
+- Reads query params: `payment_id`, `payment_request_id`, `payment_status`
+- If `payment_status === "Credit"`:
+  - Calls server action / API to write to `payments` collection
+  - Shows success UI and links back to tests
+- Otherwise shows failure UI
+
+---
+
+### Frontend — Tests Page
+
+#### [MODIFY] [tests/page.tsx](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/dashboard/tests/page.tsx)
+- [handleBuyNow](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/dashboard/tests/page.tsx#87-128) now calls `/api/create-payment` with `{ testId, userId, amount: test.price, ... }`
+- On success, `window.location.href = data.paymentUrl`
+- Access check uses new `payments` collection via `hasUserPaidForProduct`
+
+---
+
+### Test Access Gate (Optional Enhancement)
+
+#### [MODIFY] [tests/[testId]/page.tsx](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/dashboard/tests/[testId]/page.tsx)
+- Before rendering test, check `payments` collection for a completed `"NCET Ready Test"` payment
+- If no payment found, show purchase CTA instead of test content
+
+---
+
+## Verification Plan
+
+### Automated (Build Check)
+```bash
+cd /Users/rounakpaul/ncetbuddy-ed-tech-5
+npm run build
+```
+This will catch TypeScript errors, missing imports, and broken routes.
+
+### Manual Verification (After you provide new credentials)
+1. Start the dev server: `npm run dev`
+2. Navigate to `http://localhost:3000/dashboard/tests`
+3. Click "Buy Now" on a premium test — should redirect to Instamojo payment page
+4. Complete payment in Instamojo sandbox → should redirect to `https://www.ncetbuddy.in/payment-success`
+5. Verify Appwrite `payments` collection has a new document with status `Credit`
+6. Reload test list — purchased test should show "Start Test" instead of "Buy Now"
+
+> [!NOTE]
+> Since you'll be providing new API credentials, I'll leave the `INSTAMOJO_API_KEY` and `INSTAMOJO_AUTH_TOKEN` as empty placeholders in [.env.local](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/.env.local). Fill them in before testing the payment flow end-to-end.

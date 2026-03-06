@@ -38,6 +38,18 @@ export interface Purchase {
     paymentRequestId: string; // Instamojo Payment Request ID
     amount: number;
     status: 'pending' | 'completed' | 'failed';
+    productName?: string; // Product name for the new payment system
+    createdAt: number;
+}
+
+export interface Payment {
+    id?: string;
+    userId: string;
+    paymentId: string;
+    paymentRequestId: string;
+    amount: number;
+    status: string;
+    productName: string;
     createdAt: number;
 }
 

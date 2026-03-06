@@ -1,0 +1,70 @@
+# Instamojo Integration Walkthrough
+
+We've successfully replaced the scattered, old Instamojo integration with a modern, spec-compliant Payment Request API setup using server-side Next.js route handlers and Appwrite database storage.
+
+## What Was Changed
+
+### 1. Unified Payment Creation API
+We removed three old scattered API routes (`/api/payment/instamojo`, `/api/payment/callback`, `/api/payment/webhook`) and replaced them with a single, clear endpoint:
+- **`[create-payment/route.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/api/create-payment/route.ts)`**
+  - Accepts test details, user info, and amount
+  - Calls `https://test.instamojo.com/api/1.1/payment-requests/` using new environment variable credentials
+  - Returns the `longurl` payment request link directly to the frontend
+
+### 2. Frontend Buy Button Update
+The "Buy Now" button on the **Premium Educator Tests** page now correctly posts to our new `/api/create-payment` route and redirects the user cleanly to Instamojo for checkout.
+- **`[dashboard/tests/page.tsx](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/dashboard/tests/page.tsx)`**
+  - Uses [hasUserPaidForProduct()](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/lib/appwrite-db.ts#969-983) to verify access instead of the old `purchases` check
+
+### 3. Payment Success Page (Client-Side Check)
+We implemented a dedicated success landing page to handle the immediate redirect.
+- **`[payment-success/page.tsx](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/payment-success/page.tsx)`**
+  - Reads Instamojo callback parameters (`payment_id`, `payment_request_id`, `payment_status`)
+  - Ensures a fluid user experience while the backend verifies the payment
+  - Informs users if their payment succeeded or failed
+
+### 4. Robust Server-to-Server Webhook (Bulletproof)
+We added a secure webhook that Instamojo will ping behind the scenes to guarantee payment confirmation even if the user closes their browser early.
+- **`[webhook/instamojo/route.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/app/api/webhook/instamojo/route.ts)`**
+  - Uses `crypto` to generate and verify an HMAC signature based on `INSTAMOJO_SALT` to ensure the ping actually came from Instamojo.
+  - Extracts the `userId` cleanly from the custom `purpose` string we generated during checkout.
+  - Creates the official payment record in the Appwrite database safely.
+
+### 5. Appwrite DB Layer
+We expanded [appwrite-db.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/lib/appwrite-db.ts) to fully support a distinct `payments` collection.
+- **`[appwrite-db.ts](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/lib/appwrite-db.ts)`**
+  - Added [createPaymentRecord()](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/lib/appwrite-db.ts#950-968)
+  - Added [hasUserPaidForProduct()](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/lib/appwrite-db.ts#969-983)
+  - Maintained backward compatibility for older purchases if necessary, but isolated premium gating strictly to the `payments` logic
+
+### 5. Access Gating 
+We added UI-level blocking inside the actual test environment.
+- **`[TestEngine.tsx](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/components/test/TestEngine.tsx)`**
+  - If a user tries to load a premium educator test without a valid `Status === "Credit"` payment record for "NCET Ready Test", they are blocked and shown a "Premium Test" lock screen with a redirect to purchase options.
+
+---
+
+## What Needs to Happen Next
+
+> [!IMPORTANT]
+> **Action Required: Update Credentials**
+> 
+> You are using the newer **OAuth (Client ID / Client Secret)** method based on your Instamojo dashboard setup. The old Instamojo keys have been wiped from [.env.local](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/.env.local).
+> Open your [.env.local](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/.env.local) file and fill in your actual **new credentials**:
+> ```env
+> INSTAMOJO_CLIENT_ID=your_actual_client_id_here
+> INSTAMOJO_CLIENT_SECRET=your_actual_client_secret_here
+> INSTAMOJO_SALT=your_actual_mac_salt_here
+> ```
+
+> [!WARNING]
+> **Action Required: Create 'payments' Collection**
+>
+> You must log into your Appwrite console and create a new **`payments`** collection with the following attributes (all required except [id](file:///Users/rounakpaul/ncetbuddy-ed-tech-5/src/types/index.ts#196-208)):
+> - `userId` (String)
+> - `paymentId` (String)
+> - `paymentRequestId` (String)
+> - `amount` (Float or Double)
+> - `status` (String)
+> - `productName` (String)
+> - `createdAt` (Integer)

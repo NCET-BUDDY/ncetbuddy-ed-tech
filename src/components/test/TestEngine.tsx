@@ -4,11 +4,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import styles from "./TestEngine.module.css";
 import { useRouter } from "next/navigation";
-import { getTestById, saveTestResult } from "@/lib/appwrite-db";
+import { getTestById, saveTestResult, hasUserPaidForProduct } from "@/lib/appwrite-db";
 import { useAuth } from "@/context/AuthContext";
 import { Test } from "@/types";
 import { LatexRenderer } from "@/components/ui/LatexRenderer";
 import { useAnalytics } from "@/context/AnalyticsContext";
+import { Lock } from "lucide-react";
 
 interface TestEngineProps {
     testId: string;
@@ -20,6 +21,7 @@ export const TestEngine: React.FC<TestEngineProps> = ({ testId }) => {
     const { trackEvent } = useAnalytics();
     const [test, setTest] = useState<Test | null>(null);
     const [loading, setLoading] = useState(true);
+    const [hasAccess, setHasAccess] = useState(false);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState<Record<number, number>>({});
     const [markedForReview, setMarkedForReview] = useState<Set<number>>(new Set());
@@ -35,17 +37,30 @@ export const TestEngine: React.FC<TestEngineProps> = ({ testId }) => {
     const [testStartTime, setTestStartTime] = useState<number>(0);
 
     useEffect(() => {
-        const fetchTest = async () => {
-            if (!testId) return;
+        const fetchTestAndCheckAccess = async () => {
+            if (!testId || !user) {
+                setLoading(false);
+                return;
+            }
+
             const data = await getTestById(testId);
             if (data) {
                 setTest(data);
                 setTimeLeft(data.duration * 60);
+
+                // Payment check logic
+                if (data.price && data.price > 0) {
+                    const hasPaid = await hasUserPaidForProduct(user.$id, "NCET Ready Test");
+                    setHasAccess(hasPaid);
+                } else {
+                    // Free tests (or PYQs) are always accessible
+                    setHasAccess(true);
+                }
             }
             setLoading(false);
         };
-        fetchTest();
-    }, [testId]);
+        fetchTestAndCheckAccess();
+    }, [testId, user]);
 
     const isFullSyllabus = test?.isFullSyllabus && test?.subjectAllocations && test.subjectAllocations.length > 0;
 
@@ -334,8 +349,28 @@ export const TestEngine: React.FC<TestEngineProps> = ({ testId }) => {
         return className;
     };
 
-    if (loading) return <div className="p-8 text-white">Loading test...</div>;
-    if (!test) return <div className="p-8 text-white">Test not found.</div>;
+    if (loading) return <div className="p-8 text-black bg-white min-h-screen text-center flex items-center justify-center font-bold text-xl">Loading test...</div>;
+    if (!test) return <div className="p-8 text-black bg-white min-h-screen text-center flex items-center justify-center font-bold text-xl">Test not found.</div>;
+
+    if (!hasAccess) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
+                <div className="bg-card p-8 rounded-xl shadow-lg max-w-md w-full text-center border-2 border-border space-y-6">
+                    <Lock className="w-16 h-16 mx-auto text-primary" />
+                    <h2 className="text-2xl font-bold text-foreground">Premium Test</h2>
+                    <p className="text-foreground/70">
+                        This is an official educator mock test. You need to purchase the <strong>NCET Ready Test</strong> pass to access this.
+                    </p>
+                    <Button
+                        onClick={() => router.push('/dashboard/tests')}
+                        className="w-full bg-primary text-black font-bold h-12"
+                    >
+                        View Purchase Options
+                    </Button>
+                </div>
+            </div>
+        );
+    }
 
     if (!hasStarted) {
         return (

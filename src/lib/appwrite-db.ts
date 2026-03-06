@@ -1,6 +1,6 @@
 import { databases, storage, isAppwriteConfigured } from "./appwrite-student";
 import { ID, Query, Models } from "appwrite";
-import { Test, Book, FormulaCard, Notification, PYQ, SiteSettings, UserProfile, TestResult, VideoClass, Educator, VideoProgress, Purchase, EducatorVideo, EducatorStats, UserEvent, UserAnalytics, TestRankEntry, TestPerformanceSummary, QuestionAnalysis, AdminTestAnalytics, ForumPost, ForumComment, ForumCategory, CarouselBanner } from "@/types";
+import { Test, Book, FormulaCard, Notification, PYQ, SiteSettings, UserProfile, TestResult, VideoClass, Educator, VideoProgress, Purchase, Payment, EducatorVideo, EducatorStats, UserEvent, UserAnalytics, TestRankEntry, TestPerformanceSummary, QuestionAnalysis, AdminTestAnalytics, ForumPost, ForumComment, ForumCategory, CarouselBanner } from "@/types";
 
 const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db';
 
@@ -1053,8 +1053,58 @@ export const hasCompletedAnyPurchase = async (userId: string): Promise<boolean> 
         ]);
         return response.documents.length > 0;
     } catch (error) {
-        console.error("Error checking purchases:", error);
+        console.error("Error checking any purchase:", error);
         return false;
+    }
+};
+
+// --- New Payments System ---
+
+export const createPaymentRecord = async (paymentData: Payment): Promise<string | null> => {
+    if (!isAppwriteConfigured()) return null;
+    try {
+        const response = await databases.createDocument(DB_ID, 'payments', ID.unique(), {
+            userId: paymentData.userId,
+            paymentId: paymentData.paymentId,
+            paymentRequestId: paymentData.paymentRequestId,
+            amount: paymentData.amount,
+            status: paymentData.status,
+            productName: paymentData.productName,
+            createdAt: paymentData.createdAt || Math.floor(Date.now() / 1000)
+        });
+        return response.$id;
+    } catch (error) {
+        console.error("Error creating payment record:", error);
+        return null; // Don't throw to prevent crashing UI on success page
+    }
+};
+
+export const hasUserPaidForProduct = async (userId: string, productName: string): Promise<boolean> => {
+    if (!isAppwriteConfigured()) return false;
+    try {
+        const response = await databases.listDocuments(DB_ID, 'payments', [
+            Query.equal('userId', userId),
+            Query.equal('productName', productName),
+            Query.equal('status', 'Credit')
+        ]);
+        return response.documents.length > 0;
+    } catch (error) {
+        console.error("Error checking product payment:", error);
+        return false;
+    }
+};
+
+export const getUserPayments = async (userId: string): Promise<Payment[]> => {
+    if (!isAppwriteConfigured()) return [];
+    try {
+        const response = await databases.listDocuments(DB_ID, 'payments', [
+            Query.equal('userId', userId),
+            Query.orderDesc('createdAt')
+        ]);
+        return response.documents.map(doc => ({ id: doc.$id, ...doc })) as unknown as Payment[];
+    } catch (error) {
+        console.error("Error fetching user payments:", error);
+        return [];
     }
 };
 
