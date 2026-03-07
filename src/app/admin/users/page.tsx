@@ -55,6 +55,25 @@ export default function UsersManagerPage() {
         }
     };
 
+    const handleGrantTestAccess = async (user: UserProfile) => {
+        if (!confirm(`Are you sure you want to grant "NCET Ready Test" access to ${user.email}?`)) return;
+
+        try {
+            // Import the new function dynamically or at the top.
+            // Assuming it's exported from appwrite-db
+            const { grantManualTestAccess } = await import("@/lib/appwrite-db");
+            const success = await grantManualTestAccess(user.uid);
+            if (success) {
+                alert(`Successfully granted test access to ${user.email}`);
+            } else {
+                alert("Failed to grant access. They might already have it, or an error occurred.");
+            }
+        } catch (error) {
+            console.error("Error granting test access:", error);
+            alert("An error occurred while granting test access.");
+        }
+    };
+
     const filteredUsers = users.filter(user =>
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (user.displayName && user.displayName.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -95,6 +114,15 @@ export default function UsersManagerPage() {
                                 style={{ borderColor: user.premiumStatus ? "var(--text-secondary)" : "#fbbf24", color: user.premiumStatus ? "var(--text-secondary)" : "#fbbf24" }}
                             >
                                 {user.premiumStatus ? "Remove Premium" : "Give Premium"}
+                            </Button>
+
+                            <Button
+                                variant="outline"
+                                onClick={() => handleGrantTestAccess(user)}
+                                style={{ borderColor: "#10b981", color: "#10b981" }}
+                                title="Manually unlock NCET Ready Test"
+                            >
+                                Grant NCET Test
                             </Button>
 
                             {user.role !== 'admin' && (

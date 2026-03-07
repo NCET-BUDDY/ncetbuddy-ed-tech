@@ -1104,6 +1104,32 @@ export const hasUserPaidForProduct = async (userId: string, productName: string)
     }
 };
 
+export const grantManualTestAccess = async (userId: string): Promise<boolean> => {
+    if (!isAppwriteConfigured()) return false;
+    try {
+        // First check if they already have access
+        const hasAccess = await hasUserPaidForProduct(userId, "NCET Ready Test");
+        if (hasAccess) return true;
+
+        // Create a manual "Credit" payment record
+        const manualPaymentId = `manual_admin_unlock_${Date.now()}`;
+        const recordId = await createPaymentRecord({
+            userId,
+            paymentId: manualPaymentId,
+            paymentRequestId: manualPaymentId,
+            amount: 0,
+            status: 'Credit',
+            productName: "NCET Ready Test",
+            createdAt: Math.floor(Date.now() / 1000)
+        } as Payment);
+
+        return !!recordId;
+    } catch (error) {
+        console.error("Error granting manual test access:", error);
+        return false;
+    }
+};
+
 export const getUserPayments = async (userId: string): Promise<Payment[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
