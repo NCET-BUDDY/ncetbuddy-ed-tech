@@ -31,8 +31,13 @@ export async function POST(request: NextRequest) {
         if (userEmail) payload.append('email', userEmail);
         if (userPhone) payload.append('phone', userPhone);
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||
-            (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000');
+        // Use the request's origin to ensure the redirect goes back to the same domain
+        // the user is currently on (e.g. www.ncetbuddy.in), not the Vercel preview URL.
+        const origin = request.headers.get('origin') || request.headers.get('referer');
+        const baseUrl = origin
+            ? new URL(origin).origin
+            : (process.env.NEXT_PUBLIC_APP_URL ||
+                (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'));
 
         payload.append('redirect_url', `${baseUrl}/payment-success`);
         payload.append('webhook', `${baseUrl}/api/webhook/instamojo`);
