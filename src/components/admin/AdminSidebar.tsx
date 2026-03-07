@@ -19,6 +19,7 @@ export const AdminSidebar = () => {
         { label: "Mock Tests (Interactive)", href: "/admin/tests" },
         { label: "PYQs (Interactive)", href: "/admin/pyqs" },
         { label: "Users", href: "/admin/users" },
+        { label: "Withdrawals (Affiliate)", href: "/admin/withdrawals" },
         { label: "Notifications", href: "/admin/notifications" },
         { label: "Settings", href: "/admin/settings" },
     ];
