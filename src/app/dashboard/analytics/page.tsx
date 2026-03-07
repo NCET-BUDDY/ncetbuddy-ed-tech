@@ -276,8 +276,8 @@ export default function AnalyticsPage() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-black border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-xs font-black text-black uppercase tracking-widest">Loading Analytics...</p>
+                    <div className="w-10 h-10 border-3 border-slate-200 border-t-indigo-500 rounded-full animate-spin mx-auto mb-3"></div>
+                    <p className="text-xs font-medium text-slate-400">Loading Analytics...</p>
                 </div>
             </div>
         );
@@ -286,52 +286,44 @@ export default function AnalyticsPage() {
     // Locked State (Non-Premium)
     if (!isPremium) {
         return (
-            <div className="space-y-10 animate-in fade-in duration-500 pb-10">
+            <div className="space-y-8 animate-in fade-in duration-500 pb-10">
                 <div>
-                    <h1 className="text-3xl font-black text-black uppercase tracking-tight italic">Premium Analytics</h1>
-                    <p className="text-sm md:text-base text-black font-bold opacity-60 mt-1 uppercase tracking-wider">
-                        Unlock Advanced Performance Insights
-                    </p>
+                    <h1 className="text-2xl font-bold text-slate-800">Premium Analytics</h1>
+                    <p className="text-sm text-slate-400 mt-1">Unlock Advanced Performance Insights</p>
                 </div>
 
-                <Card className="relative p-12 md:p-16 border-4 border-black bg-gradient-to-br from-primary/20 to-white shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                    <div className="absolute top-8 right-8 opacity-5">
-                        <Lock size={120} />
-                    </div>
-                    <div className="relative z-10 space-y-8 text-center max-w-2xl mx-auto">
-                        <div className="inline-block p-6 bg-black rounded-3xl border-4 border-primary shadow-[4px_4px_0px_0px_rgba(255,208,47,1)]">
-                            <BarChart2 size={64} className="text-primary" />
+                <div className="relative p-10 md:p-14 border border-slate-200 bg-white rounded-2xl shadow-sm overflow-hidden">
+                    <div className="absolute top-6 right-6 opacity-5"><Lock size={100} /></div>
+                    <div className="relative z-10 space-y-6 text-center max-w-xl mx-auto">
+                        <div className="inline-block p-5 bg-indigo-50 rounded-2xl">
+                            <BarChart2 size={48} className="text-indigo-500" />
                         </div>
-                        <h2 className="text-4xl font-black text-black uppercase italic leading-tight">
-                            Premium Analytics Dashboard
-                        </h2>
-                        <p className="text-base md:text-lg text-black/70 font-bold leading-relaxed">
-                            Purchase any mock test to unlock your personalized performance dashboard with advanced insights, AI-powered recommendations, and detailed analytics.
+                        <h2 className="text-2xl font-bold text-slate-800">Premium Analytics Dashboard</h2>
+                        <p className="text-sm text-slate-500 leading-relaxed">
+                            Purchase any mock test to unlock your personalized performance dashboard with advanced insights.
                         </p>
-                        <div className="grid grid-cols-2 gap-4 mt-8">
+                        <div className="grid grid-cols-2 gap-3 mt-6">
                             {[
-                                { icon: <TrendingUp size={28} className="text-primary" />, label: "Performance Tracking" },
-                                { icon: <Target size={28} className="text-primary" />, label: "Subject Deep-Dive" },
-                                { icon: <Zap size={28} className="text-primary" />, label: "Speed Analytics" },
-                                { icon: <Brain size={28} className="text-primary" />, label: "Smart Recommendations" },
+                                { icon: <TrendingUp size={22} className="text-indigo-500" />, label: "Performance Tracking" },
+                                { icon: <Target size={22} className="text-indigo-500" />, label: "Subject Deep-Dive" },
+                                { icon: <Zap size={22} className="text-indigo-500" />, label: "Speed Analytics" },
+                                { icon: <Brain size={22} className="text-indigo-500" />, label: "Smart Recommendations" },
                             ].map((feature, i) => (
-                                <div key={i} className="p-4 bg-white border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                                    <div className="mb-2 flex justify-center">{feature.icon}</div>
-                                    <p className="text-xs font-black text-black uppercase">{feature.label}</p>
+                                <div key={i} className="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                                    <div className="mb-1.5 flex justify-center">{feature.icon}</div>
+                                    <p className="text-xs font-bold text-slate-600">{feature.label}</p>
                                 </div>
                             ))}
                         </div>
                         <Link
                             href="/dashboard/tests"
-                            className="inline-block mt-8 px-12 py-5 bg-black text-primary border-4 border-black rounded-2xl font-black uppercase text-lg shadow-[6px_6px_0px_0px_rgba(255,208,47,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all tracking-wider flex items-center gap-2 justify-center"
+                            className="inline-flex items-center gap-2 mt-6 px-8 py-3.5 bg-indigo-600 text-white rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors shadow-md"
                         >
-                            <Unlock size={20} /> Unlock Now - Browse Tests
+                            <Unlock size={16} /> Unlock Now — Browse Tests
                         </Link>
-                        <p className="text-xs text-black/40 font-bold uppercase tracking-widest">
-                            One-time purchase • Lifetime access
-                        </p>
+                        <p className="text-[10px] text-slate-300 font-medium">One-time purchase • Lifetime access</p>
                     </div>
-                </Card>
+                </div>
             </div>
         );
     }
@@ -349,9 +341,7 @@ export default function AnalyticsPage() {
             {/* Header */}
             <div className="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                    <div className="flex items-center gap-3 mb-1">
-                        <h1 className="text-3xl font-black text-slate-900">Performance</h1>
-                    </div>
+                    <h1 className="text-2xl font-bold text-slate-800">Performance</h1>
                     <p className="text-sm text-slate-400 font-bold">
                         {educator ? `${educator.name} • NCET Preparation` : "Practice Mode • NCET Preparation"}
                     </p>
@@ -364,9 +354,9 @@ export default function AnalyticsPage() {
                     <button
                         key={tab.key}
                         onClick={() => setFilter(tab.key)}
-                        className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-tight border-2 transition-all ${filter === tab.key
-                                ? 'bg-indigo-600 text-white border-indigo-600 shadow-md'
-                                : 'bg-white text-slate-500 border-slate-200 hover:border-indigo-300 hover:text-indigo-600'
+                        className={`px-4 py-2 rounded-full text-xs font-bold border transition-all ${filter === tab.key
+                            ? 'bg-indigo-600 text-white border-indigo-600'
+                            : 'bg-white text-slate-500 border-slate-200 hover:border-indigo-300'
                             }`}
                     >
                         {tab.label} {filter === tab.key && '✓'}
@@ -379,7 +369,7 @@ export default function AnalyticsPage() {
 
             {/* Test-wise Breakdown Header */}
             <div>
-                <h2 className="text-2xl font-black text-slate-900 mb-1">Test-wise Mistakes</h2>
+                <h2 className="text-xl font-bold text-slate-800 mb-1">Test-wise Mistakes</h2>
                 <p className="text-sm text-slate-400">
                     Revisit questions which you either attempted incorrectly or didn&apos;t attempt in the paper
                 </p>
@@ -395,8 +385,8 @@ export default function AnalyticsPage() {
             <div>
                 <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
                     <div className="flex items-center gap-3">
-                        <h2 className="text-2xl font-black text-slate-900">Complete Test History</h2>
-                        <span className="text-[10px] font-black bg-indigo-600 text-white px-2.5 py-1 rounded-full">{filteredResults.length} Tests</span>
+                        <h2 className="text-xl font-bold text-slate-800">Complete Test History</h2>
+                        <span className="text-[10px] font-bold bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">{filteredResults.length} Tests</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <ArrowUpDown size={14} className="text-slate-400" />
@@ -404,9 +394,9 @@ export default function AnalyticsPage() {
                             <button
                                 key={option}
                                 onClick={() => setSortBy(option)}
-                                className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border-2 transition-all ${sortBy === option
-                                        ? 'bg-indigo-600 text-white border-indigo-600'
-                                        : 'bg-white text-slate-400 border-slate-200 hover:border-indigo-300'
+                                className={`text-[10px] font-bold px-3 py-1.5 rounded-lg border transition-all capitalize ${sortBy === option
+                                    ? 'bg-indigo-600 text-white border-indigo-600'
+                                    : 'bg-white text-slate-400 border-slate-200 hover:border-indigo-300'
                                     }`}
                             >
                                 {option}
@@ -431,7 +421,7 @@ export default function AnalyticsPage() {
                         ))
                     }
                     {filteredResults.length === 0 && (
-                        <div className="p-10 text-center border-2 border-dashed border-slate-300 rounded-2xl text-slate-400 font-bold">
+                        <div className="p-8 text-center border border-dashed border-slate-200 rounded-xl text-slate-400 text-sm font-medium">
                             No tests attempted yet. Start a mock test!
                         </div>
                     )}

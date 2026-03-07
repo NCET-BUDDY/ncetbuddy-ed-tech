@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/Card";
 import { TestResult, Test } from "@/types";
 import {
     ChevronDown,
@@ -28,221 +27,113 @@ export default function TestHistoryCard({ result, test, index }: TestHistoryCard
     const maxScore = result.totalQuestions * 4;
     const accuracy = maxScore > 0 ? Math.round((result.score / maxScore) * 100) : 0;
     const date = new Date(result.completedAt * 1000);
-    const formattedDate = date.toLocaleDateString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-    });
-    const formattedTime = date.toLocaleTimeString("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    const formattedDate = date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    const formattedTime = date.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
 
-    // Calculate detailed stats
     const totalTimeSecs = result.timeTaken || 0;
     const totalTimeMins = Math.floor(totalTimeSecs / 60);
     const totalTimeRemainingSecs = totalTimeSecs % 60;
 
-    // Count correct, incorrect, skipped
-    let correct = 0;
-    let incorrect = 0;
-    let skipped = 0;
-    let attempted = 0;
-
+    let correct = 0, incorrect = 0, skipped = 0, attempted = 0;
     if (result.answers && test?.questions) {
         let questions = test.questions;
-        try {
-            while (typeof questions === "string") questions = JSON.parse(questions);
-        } catch (e) {
-            questions = [];
-        }
-
+        try { while (typeof questions === "string") questions = JSON.parse(questions); } catch { questions = []; }
         for (let i = 0; i < result.totalQuestions; i++) {
             const userAnswer = result.answers[i];
-            if (userAnswer === undefined || userAnswer === null) {
-                skipped++;
-            } else {
+            if (userAnswer === undefined || userAnswer === null) { skipped++; }
+            else {
                 attempted++;
                 const q = (questions as any[])[i];
-                if (q && userAnswer === q.correctAnswer) {
-                    correct++;
-                } else {
-                    incorrect++;
-                }
+                if (q && userAnswer === q.correctAnswer) correct++;
+                else incorrect++;
             }
         }
     } else {
-        // Fallback: estimate from score
         attempted = Object.keys(result.answers || {}).length;
         skipped = result.totalQuestions - attempted;
         correct = result.score > 0 ? Math.round(result.score / 4) : 0;
         incorrect = attempted - correct;
     }
 
-    const avgTimePerQ = attempted > 0 && totalTimeSecs > 0
-        ? Math.round(totalTimeSecs / attempted)
-        : 0;
+    const avgTimePerQ = attempted > 0 && totalTimeSecs > 0 ? Math.round(totalTimeSecs / attempted) : 0;
 
-    // Accuracy color
     const getAccuracyColor = (acc: number) => {
-        if (acc >= 80) return "text-emerald-600 bg-emerald-50 border-emerald-200";
-        if (acc >= 60) return "text-amber-600 bg-amber-50 border-amber-200";
-        return "text-red-600 bg-red-50 border-red-200";
-    };
-
-    const getScoreBadgeColor = (acc: number) => {
-        if (acc >= 80) return "bg-emerald-500";
-        if (acc >= 60) return "bg-amber-500";
-        return "bg-red-500";
+        if (acc >= 80) return "text-emerald-600 bg-emerald-50";
+        if (acc >= 60) return "text-amber-600 bg-amber-50";
+        return "text-red-500 bg-red-50";
     };
 
     return (
         <div
-            className={`border-4 border-black rounded-3xl overflow-hidden transition-all duration-300 ${isExpanded ? "shadow-[8px_8px_0px_0px_rgba(255,208,47,1)]" : "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-                } bg-white cursor-pointer group`}
+            className={`border rounded-xl overflow-hidden transition-all duration-200 bg-white cursor-pointer group ${isExpanded ? "border-indigo-200 shadow-md" : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
+                }`}
             onClick={() => setIsExpanded(!isExpanded)}
         >
-            {/* Header - Always Visible */}
-            <div className="p-5 md:p-6 flex items-center gap-4 md:gap-6">
-                {/* Rank Badge */}
-                <div className={`w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center text-white font-black text-lg md:text-xl flex-shrink-0 ${getScoreBadgeColor(accuracy)}`}>
+            {/* Header */}
+            <div className="px-4 py-3 flex items-center gap-3">
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${accuracy >= 60 ? 'bg-emerald-500' : accuracy >= 30 ? 'bg-amber-500' : 'bg-red-500'}`}>
                     #{index + 1}
                 </div>
-
-                {/* Test Info */}
                 <div className="flex-1 min-w-0">
-                    <h4 className="font-black text-black text-sm md:text-base uppercase italic tracking-tight truncate">
+                    <h4 className="font-bold text-slate-800 text-sm truncate">
                         {test?.title || `Test ${result.testId?.substring(0, 8)}`}
                     </h4>
-                    <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-1">
-                        <span className="text-[10px] font-bold text-black/40 uppercase tracking-widest">
-                            {formattedDate} • {formattedTime}
-                        </span>
+                    <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-slate-400 font-medium">{formattedDate} • {formattedTime}</span>
                         {test?.subject && (
-                            <span className="text-[9px] font-black bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full uppercase tracking-tight">
-                                {test.subject}
-                            </span>
+                            <span className="text-[9px] font-bold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded uppercase">{test.subject}</span>
                         )}
                     </div>
                 </div>
-
-                {/* Score & Expand */}
-                <div className="flex items-center gap-3 flex-shrink-0">
-                    <div className={`px-3 py-1.5 rounded-xl border-2 text-xs font-black ${getAccuracyColor(accuracy)}`}>
-                        {accuracy}%
-                    </div>
-                    <div className="text-black/30 group-hover:text-black transition-colors">
-                        {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`px-2 py-1 rounded-lg text-xs font-bold ${getAccuracyColor(accuracy)}`}>{accuracy}%</span>
+                    <div className="text-slate-300 group-hover:text-slate-500 transition-colors">
+                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </div>
                 </div>
             </div>
 
             {/* Expanded Details */}
             {isExpanded && (
-                <div className="border-t-4 border-black animate-in fade-in slide-in-from-top-2 duration-300">
-                    {/* Quick Stats Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-0 border-b-4 border-black">
-                        <div className="p-4 md:p-5 border-r-2 border-b-2 md:border-b-0 border-black/10 text-center">
-                            <div className="flex items-center justify-center gap-1.5 mb-1.5">
-                                <Trophy size={14} className="text-primary" />
-                                <span className="text-[9px] font-black text-black/40 uppercase tracking-widest">Score</span>
+                <div className="border-t border-slate-100 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <div className="grid grid-cols-4 gap-0 border-b border-slate-100">
+                        {[
+                            { icon: <Trophy size={12} className="text-amber-500" />, label: "Score", value: `${result.score}/${maxScore}` },
+                            { icon: <Clock size={12} className="text-blue-500" />, label: "Time", value: totalTimeMins > 0 ? `${totalTimeMins}m ${totalTimeRemainingSecs}s` : totalTimeSecs > 0 ? `${totalTimeSecs}s` : "N/A" },
+                            { icon: <Target size={12} className="text-purple-500" />, label: "Attempted", value: `${attempted}/${result.totalQuestions}` },
+                            { icon: <Timer size={12} className="text-orange-500" />, label: "Avg/Q", value: avgTimePerQ > 0 ? `${avgTimePerQ}s` : "N/A" },
+                        ].map((stat, idx) => (
+                            <div key={idx} className="p-3 text-center border-r border-slate-50 last:border-r-0">
+                                <div className="flex items-center justify-center gap-1 mb-1">{stat.icon}<span className="text-[9px] text-slate-400 font-medium uppercase">{stat.label}</span></div>
+                                <div className="text-sm font-bold text-slate-800">{stat.value}</div>
                             </div>
-                            <div className="text-xl md:text-2xl font-black text-black">
-                                {result.score}<span className="text-xs text-black/30 font-bold">/{maxScore}</span>
-                            </div>
-                        </div>
-                        <div className="p-4 md:p-5 md:border-r-2 border-b-2 md:border-b-0 border-black/10 text-center">
-                            <div className="flex items-center justify-center gap-1.5 mb-1.5">
-                                <Clock size={14} className="text-blue-500" />
-                                <span className="text-[9px] font-black text-black/40 uppercase tracking-widest">Time</span>
-                            </div>
-                            <div className="text-xl md:text-2xl font-black text-black">
-                                {totalTimeMins > 0 ? `${totalTimeMins}m ${totalTimeRemainingSecs}s` : totalTimeSecs > 0 ? `${totalTimeSecs}s` : "N/A"}
-                            </div>
-                        </div>
-                        <div className="p-4 md:p-5 border-r-2 border-black/10 text-center">
-                            <div className="flex items-center justify-center gap-1.5 mb-1.5">
-                                <Target size={14} className="text-purple-500" />
-                                <span className="text-[9px] font-black text-black/40 uppercase tracking-widest">Attempted</span>
-                            </div>
-                            <div className="text-xl md:text-2xl font-black text-black">
-                                {attempted}<span className="text-xs text-black/30 font-bold">/{result.totalQuestions}</span>
-                            </div>
-                        </div>
-                        <div className="p-4 md:p-5 text-center">
-                            <div className="flex items-center justify-center gap-1.5 mb-1.5">
-                                <Timer size={14} className="text-orange-500" />
-                                <span className="text-[9px] font-black text-black/40 uppercase tracking-widest">Avg/Q</span>
-                            </div>
-                            <div className="text-xl md:text-2xl font-black text-black">
-                                {avgTimePerQ > 0 ? `${avgTimePerQ}s` : "N/A"}
-                            </div>
-                        </div>
+                        ))}
                     </div>
 
-                    {/* Breakdown Section */}
-                    <div className="p-5 md:p-6 space-y-4">
-                        <h5 className="text-xs font-black text-black uppercase tracking-widest italic">Question Breakdown</h5>
-
-                        {/* Correct */}
-                        <div className="space-y-1.5">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <CheckCircle2 size={14} className="text-emerald-500" />
-                                    <span className="text-xs font-black text-black uppercase tracking-tight">Correct</span>
+                    <div className="px-4 py-3 space-y-2.5">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Question Breakdown</p>
+                        {[
+                            { icon: <CheckCircle2 size={12} className="text-emerald-500" />, label: "Correct", count: correct, marks: `+${correct * 4}`, color: "bg-emerald-500", textColor: "text-emerald-600" },
+                            { icon: <XCircle size={12} className="text-red-400" />, label: "Incorrect", count: incorrect, marks: `-${incorrect}`, color: "bg-red-400", textColor: "text-red-500" },
+                            { icon: <MinusCircle size={12} className="text-slate-300" />, label: "Skipped", count: skipped, marks: "0", color: "bg-slate-300", textColor: "text-slate-400" },
+                        ].map((item) => (
+                            <div key={item.label} className="flex items-center gap-2">
+                                {item.icon}
+                                <span className="text-xs font-medium text-slate-600 w-16">{item.label}</span>
+                                <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                    <div className={`h-full ${item.color} rounded-full transition-all duration-500`} style={{ width: `${result.totalQuestions > 0 ? (item.count / result.totalQuestions) * 100 : 0}%` }} />
                                 </div>
-                                <span className="text-xs font-black text-emerald-600">{correct} (+{correct * 4} marks)</span>
+                                <span className={`text-xs font-bold ${item.textColor} w-12 text-right`}>{item.count} ({item.marks})</span>
                             </div>
-                            <div className="w-full h-3 bg-black/5 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-emerald-500 rounded-full transition-all duration-700"
-                                    style={{ width: `${result.totalQuestions > 0 ? (correct / result.totalQuestions) * 100 : 0}%` }}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Incorrect */}
-                        <div className="space-y-1.5">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <XCircle size={14} className="text-red-500" />
-                                    <span className="text-xs font-black text-black uppercase tracking-tight">Incorrect</span>
-                                </div>
-                                <span className="text-xs font-black text-red-600">{incorrect} (-{incorrect} marks)</span>
-                            </div>
-                            <div className="w-full h-3 bg-black/5 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-red-500 rounded-full transition-all duration-700"
-                                    style={{ width: `${result.totalQuestions > 0 ? (incorrect / result.totalQuestions) * 100 : 0}%` }}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Skipped */}
-                        <div className="space-y-1.5">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <MinusCircle size={14} className="text-slate-400" />
-                                    <span className="text-xs font-black text-black uppercase tracking-tight">Skipped</span>
-                                </div>
-                                <span className="text-xs font-black text-slate-400">{skipped} (0 marks)</span>
-                            </div>
-                            <div className="w-full h-3 bg-black/5 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-slate-300 rounded-full transition-all duration-700"
-                                    style={{ width: `${result.totalQuestions > 0 ? (skipped / result.totalQuestions) * 100 : 0}%` }}
-                                />
-                            </div>
-                        </div>
+                        ))}
                     </div>
 
-                    {/* Accuracy Footer */}
-                    <div className="p-4 md:p-5 bg-black text-white flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <BarChart3 size={16} className="text-primary" />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Final Accuracy</span>
+                    <div className="px-4 py-2.5 bg-slate-50 flex items-center justify-between border-t border-slate-100">
+                        <div className="flex items-center gap-1.5">
+                            <BarChart3 size={12} className="text-indigo-500" />
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">Final Accuracy</span>
                         </div>
-                        <span className="text-lg font-black text-primary">{accuracy}%</span>
+                        <span className="text-sm font-bold text-indigo-600">{accuracy}%</span>
                     </div>
                 </div>
             )}

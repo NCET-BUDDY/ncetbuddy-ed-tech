@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { getLeaderboardSummary, getUserTestResults, getTestById } from "@/lib/appwrite-db";
+import { getLeaderboardSummary } from "@/lib/appwrite-db";
 import SubjectRadar from "./SubjectRadar";
 import TimeAnalysis from "./TimeAnalysis";
 import RankPredictor from "./RankPredictor";
@@ -30,36 +30,28 @@ export default function ProAnalyticsDashboard({ userResults, testDetailsMap, sub
             }
         };
         fetchStanding();
-    }, [user, userResults]); // Re-fetch if results change
+    }, [user, userResults]);
 
-    if (!isPremium) {
-        // Locked State Visualization is handled in parent, this component usually won't mount or will show blurred
-        return null;
-    }
+    if (!isPremium) return null;
 
     return (
-        <section className="animate-in fade-in slide-in-from-bottom-5 duration-700">
-            <div className="flex items-center gap-3 mb-8">
-                <Rocket size={32} className="text-black" />
+        <section className="animate-in fade-in slide-in-from-bottom-3 duration-500">
+            <div className="flex items-center gap-2.5 mb-6">
+                <Rocket size={20} className="text-indigo-500" />
                 <div>
-                    <h2 className="text-3xl font-black text-black uppercase tracking-tighter italic">Pro Insights</h2>
-                    <p className="text-sm text-black/60 font-bold uppercase tracking-widest">Deep dive into your performance metrics</p>
+                    <h2 className="text-xl font-bold text-slate-800">Pro Insights</h2>
+                    <p className="text-xs text-slate-400">Deep dive into your performance metrics</p>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {/* 1. Rank Predictor */}
-                <div className="lg:col-span-1 h-full min-h-[400px]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="lg:col-span-1 h-full min-h-[350px]">
                     <RankPredictor userStanding={userStanding} />
                 </div>
-
-                {/* 2. Weakness Heatmap (Radar Chart) */}
-                <div className="lg:col-span-2 min-h-[400px]">
+                <div className="lg:col-span-2 min-h-[350px]">
                     <SubjectRadar subjectData={subjectInsights.allSubjects} />
                 </div>
-
-                {/* 3. Time Analysis */}
-                <div className="lg:col-span-3 min-h-[400px]">
+                <div className="lg:col-span-3 min-h-[350px]">
                     <TimeAnalysis results={userResults} testDetailsMap={testDetailsMap} />
                 </div>
             </div>

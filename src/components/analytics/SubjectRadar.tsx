@@ -10,17 +10,9 @@ import {
     Legend,
 } from 'chart.js';
 import { Radar } from 'react-chartjs-2';
-import { Card } from "@/components/ui/Card";
 import { Network } from "lucide-react";
 
-ChartJS.register(
-    RadialLinearScale,
-    PointElement,
-    LineElement,
-    Filler,
-    Tooltip,
-    Legend
-);
+ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 interface SubjectRadarProps {
     subjectData: { subject: string; accuracy: number }[];
@@ -29,94 +21,67 @@ interface SubjectRadarProps {
 export default function SubjectRadar({ subjectData }: SubjectRadarProps) {
     if (subjectData.length < 3) {
         return (
-            <Card className="p-8 border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] h-full flex flex-col items-center justify-center text-center">
-                <div className="mb-4 opacity-20"><Network size={40} className="mx-auto" /></div>
-                <p className="text-sm font-black text-black uppercase opacity-40 italic">
-                    Attempt tests in at least 3 different subjects to unlock Radar View
+            <div className="bg-white rounded-2xl border border-slate-200 p-8 h-full flex flex-col items-center justify-center text-center">
+                <Network size={32} className="mx-auto text-slate-300 mb-3" />
+                <p className="text-sm font-medium text-slate-400">
+                    Attempt tests in at least 3 subjects to unlock Radar View
                 </p>
-            </Card>
+            </div>
         );
     }
 
     const data = {
         labels: subjectData.map(d => d.subject),
-        datasets: [
-            {
-                label: 'Accuracy %',
-                data: subjectData.map(d => d.accuracy),
-                backgroundColor: 'rgba(255, 208, 47, 0.2)', // Primary color with opacity
-                borderColor: '#FFD02F', // Primary color
-                borderWidth: 3,
-                pointBackgroundColor: '#000',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: '#000',
-            },
-        ],
+        datasets: [{
+            label: 'Accuracy %',
+            data: subjectData.map(d => d.accuracy),
+            backgroundColor: 'rgba(99, 102, 241, 0.15)',
+            borderColor: '#6366f1',
+            borderWidth: 2,
+            pointBackgroundColor: '#6366f1',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: '#6366f1',
+        }],
     };
 
     const options = {
         scales: {
             r: {
-                angleLines: {
-                    color: 'rgba(0, 0, 0, 0.1)'
-                },
-                grid: {
-                    color: 'rgba(0, 0, 0, 0.1)'
-                },
+                angleLines: { color: 'rgba(0,0,0,0.06)' },
+                grid: { color: 'rgba(0,0,0,0.06)' },
                 pointLabels: {
-                    font: {
-                        size: 11,
-                        weight: 900,
-                        family: 'sans-serif'
-                    },
-                    color: '#000',
-                    backdropColor: 'transparent' // Hide backdrop behind labels
+                    font: { size: 11, weight: 700 as const },
+                    color: '#334155',
                 },
-                ticks: {
-                    display: false, // Hide the numbers on the scale lines
-                    stepSize: 20
-                },
+                ticks: { display: false, stepSize: 20 },
                 suggestedMin: 0,
-                suggestedMax: 100
+                suggestedMax: 100,
             },
         },
         plugins: {
-            legend: {
-                display: false
-            },
+            legend: { display: false },
             tooltip: {
-                backgroundColor: '#000',
+                backgroundColor: '#1e293b',
                 titleFont: { weight: 'bold' as const },
-                padding: 12,
+                padding: 10,
                 cornerRadius: 8,
                 displayColors: false,
-                callbacks: {
-                    label: function (context: any) {
-                        return `${context.raw}% Accuracy`;
-                    }
-                }
-            }
+                callbacks: { label: (ctx: any) => `${ctx.raw}% Accuracy` },
+            },
         },
-        elements: {
-            line: {
-                tension: 0.2 // Smooth lines
-            }
-        }
+        elements: { line: { tension: 0.2 } },
     };
 
     return (
-        <Card className="p-6 md:p-8 border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-6">
-                <div className="h-8 w-2 bg-primary rounded-full"></div>
-                <div>
-                    <h2 className="text-xl font-black text-black uppercase tracking-widest italic">Weakness Heatmap</h2>
-                    <p className="text-xs text-black/40 font-bold uppercase tracking-widest">Identify gaps at a glance</p>
-                </div>
+        <div className="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col h-full shadow-sm">
+            <div className="mb-4">
+                <h3 className="text-base font-bold text-slate-800">Weakness Heatmap</h3>
+                <p className="text-xs text-slate-400">Identify gaps at a glance</p>
             </div>
-            <div className="flex-1 w-full max-h-[350px] relative">
+            <div className="flex-1 w-full max-h-[320px] relative">
                 <Radar data={data} options={options} />
             </div>
-        </Card>
+        </div>
     );
 }
