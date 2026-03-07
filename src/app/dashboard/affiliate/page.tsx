@@ -128,7 +128,7 @@ export default function AffiliateDashboard() {
         <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in zoom-in duration-500">
             <div>
                 <h1 className="text-3xl font-black text-slate-900 tracking-tight">Refer & Earn</h1>
-                <p className="text-slate-500 mt-2">Share your link and earn 25% commission (₹100) on every NRT Test sale!</p>
+                <p className="text-slate-500 mt-2">Share your link and earn 25% commission on every test sale!</p>
             </div>
 
             {/* Link Generation Section */}
@@ -162,8 +162,7 @@ export default function AffiliateDashboard() {
                     <div className="w-full md:w-auto bg-rose-50 rounded-2xl p-6 text-center border border-rose-100 shrink-0">
                         <div className="text-sm font-bold text-rose-600 uppercase tracking-wider mb-1">Commission</div>
                         <div className="text-4xl font-black text-rose-900 flex items-center justify-center gap-1">
-                            <IndianRupee size={28} className="text-rose-500" />
-                            100
+                            25%
                         </div>
                         <div className="text-xs text-rose-500/80 font-medium mt-1">per successful sale</div>
                     </div>
