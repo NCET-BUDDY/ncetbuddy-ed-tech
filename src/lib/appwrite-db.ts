@@ -493,11 +493,21 @@ export const getUserTestResults = async (userId: string): Promise<TestResult[]> 
             Query.equal('userId', userId),
             Query.orderDesc('completedAt')
         ]);
-        return response.documents.map(doc => ({
+        const results = response.documents.map(doc => ({
             id: doc.$id,
             ...doc,
             answers: typeof doc.answers === 'string' ? JSON.parse(doc.answers) : doc.answers
         })) as unknown as TestResult[];
+
+        // Deduplicate: same testId, score, and minute window
+        const seenKeys = new Set<string>();
+        return results.filter(r => {
+            const timeWindow = Math.floor(r.completedAt / 60);
+            const key = `${r.testId}-${timeWindow}-${r.score}`;
+            if (seenKeys.has(key)) return false;
+            seenKeys.add(key);
+            return true;
+        });
     } catch (error) {
         console.error("Error fetching user test results:", error);
         return [];
