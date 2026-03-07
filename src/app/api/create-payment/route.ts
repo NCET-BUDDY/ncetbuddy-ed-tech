@@ -6,7 +6,7 @@ const INSTAMOJO_BASE_URL = "https://www.instamojo.com/api/1.1";
 
 export async function POST(request: NextRequest) {
     try {
-        const { testId, userId, amount, userName, userEmail, userPhone, affiliateId } = await request.json();
+        const { testId, userId, amount, userName, userEmail, userPhone, affiliateId, clientOrigin } = await request.json();
 
         if (!testId || !userId || amount === undefined || amount === null) {
             return NextResponse.json({ error: "Missing required fields: testId, userId, or amount" }, { status: 400 });
@@ -31,13 +31,19 @@ export async function POST(request: NextRequest) {
         if (userEmail) payload.append('email', userEmail);
         if (userPhone) payload.append('phone', userPhone);
 
-        // Use the request's origin to ensure the redirect goes back to the same domain
-        // the user is currently on (e.g. www.ncetbuddy.in), not the Vercel preview URL.
-        const origin = request.headers.get('origin') || request.headers.get('referer');
-        const baseUrl = origin
-            ? new URL(origin).origin
-            : (process.env.NEXT_PUBLIC_APP_URL ||
-                (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'));
+        // Highest Priority: Use explicit clientOrigin sent from the frontend request
+        // Fallback 1: HTTP header Origin or Referer
+        // Fallback 2: Environment variables
+        const headerOrigin = request.headers.get('origin') || request.headers.get('referer');
+
+        let baseUrl;
+        if (clientOrigin) {
+            baseUrl = clientOrigin;
+        } else if (headerOrigin) {
+            baseUrl = new URL(headerOrigin).origin;
+        } else {
+            baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000');
+        }
 
         payload.append('redirect_url', `${baseUrl}/payment-success`);
         payload.append('webhook', `${baseUrl}/api/webhook/instamojo`);

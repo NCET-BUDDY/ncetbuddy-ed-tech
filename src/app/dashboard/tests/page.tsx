@@ -125,7 +125,8 @@ function EducatorTestsList() {
                     userEmail: user.email,
                     userName: user.name,
                     userPhone: user.phone || '',
-                    affiliateId
+                    affiliateId,
+                    clientOrigin: window.location.origin
                 })
             });
 
