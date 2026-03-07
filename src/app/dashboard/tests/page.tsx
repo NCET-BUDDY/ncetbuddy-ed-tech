@@ -190,7 +190,7 @@ function EducatorTestsList() {
                                 {test.title}
                             </h3>
                             <p className="text-foreground/70 text-sm font-medium mb-4 line-clamp-2">
-                                {test.description || "Premium verification mock test."}
+                                {test.description || "Pack of 10 Full Relevant Mock Test"}
                             </p>
 
                             <div className="mt-auto pt-4 border-t border-border">
