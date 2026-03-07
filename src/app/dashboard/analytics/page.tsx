@@ -7,7 +7,8 @@ import { getUserTestResults, getTestById, getUserProfile, getEducator, hasComple
 import { TestResult, Test, UserProfile, Educator } from "@/types";
 import Link from "next/link";
 import ProAnalyticsDashboard from "@/components/analytics/ProAnalyticsDashboard";
-import { Lock, Unlock, BarChart2, TrendingUp, Target, Zap, Brain, Flame, FileText, Star } from "lucide-react";
+import TestHistoryCard from "@/components/analytics/TestHistoryCard";
+import { Lock, Unlock, BarChart2, TrendingUp, Target, Zap, Brain, Flame, FileText, Star, ArrowUpDown, Clock, CheckCircle2, Trophy } from "lucide-react";
 
 export default function AnalyticsPage() {
     const { user } = useAuth();
@@ -28,6 +29,7 @@ export default function AnalyticsPage() {
 
     const [recentPerformance, setRecentPerformance] = useState<{ title: string; score: number; total: number }[]>([]);
     const [loading, setLoading] = useState(true);
+    const [sortBy, setSortBy] = useState<'date' | 'score' | 'accuracy'>('date');
 
     const [subjectInsights, setSubjectInsights] = useState<{
         strongest: { subject: string; accuracy: number }[];
@@ -331,6 +333,28 @@ export default function AnalyticsPage() {
                 ))}
             </div>
 
+            {/* Summary Stats Bar */}
+            {results.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-black rounded-3xl border-4 border-black">
+                    <div className="text-center p-3">
+                        <div className="flex items-center justify-center gap-1.5 mb-1"><FileText size={14} className="text-primary" /><span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Total Tests</span></div>
+                        <div className="text-2xl font-black text-primary">{results.length}</div>
+                    </div>
+                    <div className="text-center p-3">
+                        <div className="flex items-center justify-center gap-1.5 mb-1"><Trophy size={14} className="text-emerald-400" /><span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Best Score</span></div>
+                        <div className="text-2xl font-black text-emerald-400">{Math.max(...results.map(r => Math.round((r.score / (r.totalQuestions * 4)) * 100)))}%</div>
+                    </div>
+                    <div className="text-center p-3">
+                        <div className="flex items-center justify-center gap-1.5 mb-1"><Target size={14} className="text-blue-400" /><span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Avg Accuracy</span></div>
+                        <div className="text-2xl font-black text-blue-400">{stats.trueAccuracy}%</div>
+                    </div>
+                    <div className="text-center p-3">
+                        <div className="flex items-center justify-center gap-1.5 mb-1"><Clock size={14} className="text-orange-400" /><span className="text-[9px] font-black text-white/40 uppercase tracking-widest">Total Time</span></div>
+                        <div className="text-2xl font-black text-orange-400">{Math.round(results.reduce((a, r) => a + (r.timeTaken || 0), 0) / 60)}m</div>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 {/* Main Graph Area */}
                 <div className="lg:col-span-2 space-y-10">
@@ -373,36 +397,47 @@ export default function AnalyticsPage() {
                     </section>
 
                     <section>
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="h-8 w-2 bg-black rounded-full"></div>
-                            <h2 className="text-xl font-black text-black uppercase tracking-widest italic">Recent Exam Attempts</h2>
+                        <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+                            <div className="flex items-center gap-3">
+                                <div className="h-8 w-2 bg-black rounded-full"></div>
+                                <h2 className="text-xl font-black text-black uppercase tracking-widest italic">Complete Test History</h2>
+                                <span className="text-[10px] font-black bg-black text-primary px-2 py-1 rounded-lg">{results.length} Tests</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <ArrowUpDown size={14} className="text-black/40" />
+                                {(['date', 'score', 'accuracy'] as const).map(option => (
+                                    <button
+                                        key={option}
+                                        onClick={() => setSortBy(option)}
+                                        className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border-2 transition-all ${sortBy === option
+                                                ? 'bg-black text-primary border-black'
+                                                : 'bg-white text-black/40 border-black/10 hover:border-black'
+                                            }`}
+                                    >
+                                        {option}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                         <div className="space-y-4">
-                            {results.slice(0, 5).map((res, i) => (
-                                <div key={i} className="flex flex-col md:flex-row md:items-center justify-between p-6 rounded-3xl bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(255,208,47,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all group gap-4">
-                                    <div className="flex items-center gap-6">
-                                        <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-primary text-2xl border-2 border-black group-hover:bg-primary group-hover:text-black transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex-shrink-0">
-                                            📜
-                                        </div>
-                                        <div>
-                                            <h4 className="font-black text-black text-lg uppercase italic tracking-tight">{results.find(r => r.id === res.id) ? "Mock Test" : "Exam"}</h4>
-                                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 text-xs text-black font-bold uppercase tracking-widest opacity-60">
-                                                <span>{new Date(res.completedAt * 1000).toLocaleDateString()}</span>
-                                                <span className="hidden md:inline">•</span>
-                                                <span>Scored {res.score}/{res.totalQuestions * 4}</span>
-                                                <span className="hidden md:inline">•</span>
-                                                <span className="text-green-600">Integrity: Clean</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button className="text-[10px] font-black uppercase tracking-widest text-black border-2 border-black px-6 py-2.5 rounded-xl hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-center">
-                                        VIEW REPORT
-                                    </button>
-                                </div>
-                            ))}
+                            {[...results]
+                                .sort((a, b) => {
+                                    if (sortBy === 'score') return b.score - a.score;
+                                    if (sortBy === 'accuracy') return (b.score / (b.totalQuestions * 4)) - (a.score / (a.totalQuestions * 4));
+                                    return b.completedAt - a.completedAt;
+                                })
+                                .map((res, i) => (
+                                    <TestHistoryCard
+                                        key={res.id || i}
+                                        result={res}
+                                        test={testDetailsMap.get(res.testId)}
+                                        index={i}
+                                    />
+                                ))
+                            }
                             {results.length === 0 && (
                                 <div className="p-10 text-center border-4 border-dashed border-black rounded-3xl text-black font-black uppercase opacity-20 italic">
-                                    No official exams attempted yet
+                                    No tests attempted yet. Start a mock test!
                                 </div>
                             )}
                         </div>

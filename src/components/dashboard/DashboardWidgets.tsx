@@ -244,71 +244,80 @@ export const PerformanceAnalytics = ({ score, trend, history = [] }: { score: nu
     const pathString = getPath(dataPoints);
     const fillPathString = `${pathString} L 500 100 L 0 100 Z`;
     return (
-        <Card className="bg-white border-slate-100 shadow-sm p-6 rounded-3xl flex flex-col">
-            <div className="flex justify-between items-center mb-6 md:mb-8">
-                <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-rose-500">
-                        <TrendingUp size={18} />
-                    </div>
-                    <h2 className="text-lg font-black text-slate-900 tracking-tight">Analytics</h2>
-                </div>
-            </div>
-
-            <div className="space-y-6">
-                <div>
-                    <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-sm font-black text-slate-900">Score Trend</h3>
-                        <div className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
-                            Last 30 Days ▾
+        <Link href="/dashboard/analytics" className="block group">
+            <Card className="bg-white border-slate-100 shadow-sm p-6 rounded-3xl flex flex-col hover:shadow-md transition-all hover:border-rose-100">
+                <div className="flex justify-between items-center mb-6 md:mb-8">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-rose-500">
+                            <TrendingUp size={18} />
                         </div>
-                    </div>
-
-                    {/* Improved Responsive SVG Trendline */}
-                    <div className="h-24 w-full relative group bg-slate-50/50 rounded-xl p-2">
-                        <svg
-                            className="w-full h-full"
-                            viewBox="0 0 500 100"
-                            preserveAspectRatio="none"
-                        >
-                            <path
-                                d={fillPathString}
-                                fill="url(#gradient-fixed)"
-                                fillOpacity="0.1"
-                            />
-                            <path
-                                d={pathString}
-                                fill="none"
-                                stroke="#E11D48"
-                                strokeWidth="3"
-                                strokeLinecap="round"
-                            />
-                            <defs>
-                                <linearGradient id="gradient-fixed" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stopColor="#E11D48" />
-                                    <stop offset="100%" stopColor="transparent" />
-                                </linearGradient>
-                            </defs>
-                        </svg>
-                        <div className="flex justify-between px-1 mt-2 text-[8px] font-bold text-slate-300 uppercase tracking-tighter">
-                            <span>Week 1</span>
-                            <span>Week 2</span>
-                            <span>Week 3</span>
-                            <span>Current</span>
-                        </div>
+                        <h2 className="text-lg font-black text-slate-900 tracking-tight">Analytics</h2>
                     </div>
                 </div>
 
-                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex justify-between items-center">
+                <div className="space-y-6">
                     <div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Projected NCET Score</p>
-                        <h4 className="text-2xl font-black text-slate-900">{score}</h4>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-black text-slate-900">Score Trend</h3>
+                            <div className="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+                                Last 30 Days ▾
+                            </div>
+                        </div>
+
+                        {/* Improved Responsive SVG Trendline */}
+                        <div className="h-24 w-full relative group bg-slate-50/50 rounded-xl p-2">
+                            <svg
+                                className="w-full h-full"
+                                viewBox="0 0 500 100"
+                                preserveAspectRatio="none"
+                            >
+                                <path
+                                    d={fillPathString}
+                                    fill="url(#gradient-fixed)"
+                                    fillOpacity="0.1"
+                                />
+                                <path
+                                    d={pathString}
+                                    fill="none"
+                                    stroke="#E11D48"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                />
+                                <defs>
+                                    <linearGradient id="gradient-fixed" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stopColor="#E11D48" />
+                                        <stop offset="100%" stopColor="transparent" />
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div className="flex justify-between px-1 mt-2 text-[8px] font-bold text-slate-300 uppercase tracking-tighter">
+                                <span>Week 1</span>
+                                <span>Week 2</span>
+                                <span>Week 3</span>
+                                <span>Current</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="text-right">
-                        <span className="text-[10px] font-black text-emerald-500">+{trend}%</span>
+
+                    <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex justify-between items-center">
+                        <div>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Projected NCET Score</p>
+                            <h4 className="text-2xl font-black text-slate-900">{score}</h4>
+                        </div>
+                        <div className="text-right">
+                            <span className="text-[10px] font-black text-emerald-500">+{trend}%</span>
+                        </div>
+                    </div>
+
+                    {/* View Details CTA */}
+                    <div className="text-center pt-2">
+                        <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest group-hover:underline transition-all">
+                            View Detailed Analytics →
+                        </span>
                     </div>
                 </div>
-            </div>
-        </Card>
+            </Card>
+        </Link>
     );
 };
 
