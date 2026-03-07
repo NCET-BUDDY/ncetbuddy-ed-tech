@@ -96,7 +96,8 @@ export default function AdminDashboard() {
                             <thead>
                                 <tr style={{ borderBottom: "1px solid var(--border)" }}>
                                     <th style={{ padding: "1rem", textAlign: "left" }}>Date</th>
-                                    <th style={{ padding: "1rem", textAlign: "left" }}>Test ID</th>
+                                    <th style={{ padding: "1rem", textAlign: "left" }}>User Email</th>
+                                    <th style={{ padding: "1rem", textAlign: "left" }}>Product</th>
                                     <th style={{ padding: "1rem", textAlign: "left" }}>Amount</th>
                                     <th style={{ padding: "1rem", textAlign: "left" }}>Status</th>
                                 </tr>
@@ -107,8 +108,11 @@ export default function AdminDashboard() {
                                         <td style={{ padding: "1rem" }}>
                                             {new Date(purchase.createdAt * 1000).toLocaleDateString()}
                                         </td>
+                                        <td style={{ padding: "1rem", fontSize: "0.9rem" }}>
+                                            {purchase.email || 'Unknown User'}
+                                        </td>
                                         <td style={{ padding: "1rem", fontFamily: "monospace", fontSize: "0.9rem" }}>
-                                            {purchase.testId.substring(0, 8)}...
+                                            {(purchase.testId || '').substring(0, 15)}...
                                         </td>
                                         <td style={{ padding: "1rem", fontWeight: "bold" }}>
                                             ₹{purchase.amount}

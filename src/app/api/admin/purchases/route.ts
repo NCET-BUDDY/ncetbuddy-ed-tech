@@ -16,9 +16,22 @@ export async function GET(request: NextRequest) {
             Query.limit(3000)
         ]);
 
+        // Fetch users to map emails
+        const usersResponse = await databases.listDocuments(DB_ID, 'users', [Query.limit(5000)]);
+        const userProfilesResponse = await databases.listDocuments(DB_ID, 'user_profiles', [Query.limit(5000)]);
+
+        const userMap: Record<string, string> = {};
+        usersResponse.documents.forEach(doc => {
+            if (doc.email) userMap[doc.$id] = doc.email;
+        });
+        userProfilesResponse.documents.forEach(doc => {
+            if (doc.email) userMap[doc.$id] = doc.email;
+        });
+
         // Normalize legacy purchases
         const formattedPurchases = purchasesResponse.documents.map(doc => ({
             id: doc.$id,
+            email: userMap[doc.userId] || 'Unknown User',
             testId: doc.testId || doc.productName || 'Unknown',
             amount: doc.amount || 0,
             status: doc.status || 'pending',
@@ -29,6 +42,7 @@ export async function GET(request: NextRequest) {
         // Normalize new payments (map 'Credit' to 'completed')
         const formattedPayments = paymentsResponse.documents.map(doc => ({
             id: doc.$id,
+            email: userMap[doc.userId] || 'Unknown User',
             testId: doc.productName || 'Payment',
             amount: doc.amount || 0,
             status: doc.status === 'Credit' ? 'completed' : (doc.status === 'Failed' ? 'failed' : doc.status),
