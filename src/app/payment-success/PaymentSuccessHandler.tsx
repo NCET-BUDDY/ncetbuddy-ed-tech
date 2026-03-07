@@ -3,7 +3,7 @@
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
-import { createPaymentRecord } from '@/lib/appwrite-db';
+// Removed unused import
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 
 export default function PaymentSuccessHandler() {
@@ -39,15 +39,19 @@ export default function PaymentSuccessHandler() {
             // The Webhook handles the actual dynamic parsing of the purpose string.
             if (paymentStatus === 'Credit') {
                 try {
-                    // Try to save the payment record to Appwrite
-                    await createPaymentRecord({
-                        userId: user.$id,
-                        paymentId: paymentId,
-                        paymentRequestId: paymentRequestId,
-                        amount: 0, // Handled properly by webhook
-                        status: paymentStatus,
-                        productName: "NCET Ready Test",
-                        createdAt: Math.floor(Date.now() / 1000)
+                    // Try to save the payment record to Appwrite safely via the backend
+                    await fetch('/api/user/verify-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            userId: user.$id,
+                            paymentId: paymentId,
+                            paymentRequestId: paymentRequestId,
+                            amount: 0, // Handled properly by webhook
+                            status: paymentStatus,
+                            productName: "NCET Ready Test",
+                            createdAt: Math.floor(Date.now() / 1000)
+                        })
                     });
 
                     setStatus('success');

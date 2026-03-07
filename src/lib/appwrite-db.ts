@@ -1070,34 +1070,21 @@ export const hasCompletedAnyPurchase = async (userId: string): Promise<boolean> 
 
 // --- New Payments System ---
 
-export const createPaymentRecord = async (paymentData: Payment): Promise<string | null> => {
-    if (!isAppwriteConfigured()) return null;
-    try {
-        const response = await databases.createDocument(DB_ID, 'payments', ID.unique(), {
-            userId: paymentData.userId,
-            paymentId: paymentData.paymentId,
-            paymentRequestId: paymentData.paymentRequestId,
-            amount: paymentData.amount,
-            status: paymentData.status,
-            productName: paymentData.productName,
-            createdAt: paymentData.createdAt || Math.floor(Date.now() / 1000)
-        });
-        return response.$id;
-    } catch (error) {
-        console.error("Error creating payment record:", error);
-        return null; // Don't throw to prevent crashing UI on success page
-    }
-};
-
 export const hasUserPaidForProduct = async (userId: string, productName: string): Promise<boolean> => {
-    if (!isAppwriteConfigured()) return false;
     try {
-        const response = await databases.listDocuments(DB_ID, 'payments', [
-            Query.equal('userId', userId),
-            Query.equal('productName', productName),
-            Query.equal('status', 'Credit')
-        ]);
-        return response.documents.length > 0;
+        const baseUrl = typeof window !== 'undefined'
+            ? window.location.origin
+            : process.env.NEXT_PUBLIC_APP_URL || (process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000');
+
+        const url = new URL('/api/user/check-payment', baseUrl);
+        url.searchParams.append('userId', userId);
+        url.searchParams.append('productName', productName);
+
+        const response = await fetch(url.toString(), { cache: 'no-store' });
+        if (!response.ok) return false;
+
+        const data = await response.json();
+        return data.hasAccess || false;
     } catch (error) {
         console.error("Error checking product payment:", error);
         return false;

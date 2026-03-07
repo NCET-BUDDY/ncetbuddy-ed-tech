@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createPaymentRecord } from "@/lib/appwrite-db";
 import { databases, DB_ID } from "@/lib/server/appwrite-admin";
 import { ID } from "node-appwrite";
 import crypto from 'crypto';
@@ -70,15 +69,20 @@ export async function POST(request: NextRequest) {
 
         // 3. Write securely to database
         if (status === 'Credit') {
-            await createPaymentRecord({
-                userId: userId,
-                paymentId: paymentId,
-                paymentRequestId: paymentRequestId,
-                amount: amount,
-                status: status,
-                productName: productName,
-                createdAt: Math.floor(Date.now() / 1000)
-            });
+            await databases.createDocument(
+                DB_ID,
+                'payments',
+                ID.unique(),
+                {
+                    userId: userId,
+                    paymentId: paymentId,
+                    paymentRequestId: paymentRequestId,
+                    amount: amount,
+                    status: status,
+                    productName: productName,
+                    createdAt: Math.floor(Date.now() / 1000)
+                }
+            );
 
             // 4. Handle Affiliate Commission
             if (affiliateId && affiliateId !== userId) {
