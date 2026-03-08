@@ -122,8 +122,28 @@ function TestReviewContent() {
                 ]);
 
                 if (testData) setTest(testData);
-                if (perfData) setPerformance(perfData);
-                setQuestionAnalysis(analysis);
+                if (perfData) {
+                    setPerformance(perfData);
+
+                    // Fallback: If session storage was empty, use data from perfData
+                    if (Object.keys(parsedAnswers).length === 0 && perfData.answers) {
+                        setUserAnswers(perfData.answers);
+                        parsedAnswers = perfData.answers;
+                    }
+                    if (Object.keys(parsedQuestionTimes).length === 0 && perfData.questionTimes) {
+                        setQuestionTimes(perfData.questionTimes);
+                        parsedQuestionTimes = perfData.questionTimes;
+                    }
+                    if (timeTaken === 0 && perfData.timeTaken) {
+                        setTimeTaken(perfData.timeTaken);
+                    }
+                }
+
+                // Recalculate analysis if we got new answers from fallback
+                const finalAnalysis = analysis.length > 0 ? analysis :
+                    await getQuestionLevelAnalysis(testId, parsedAnswers, parsedQuestionTimes);
+
+                setQuestionAnalysis(finalAnalysis);
 
             } catch (error) {
                 console.error("Error loading test review:", error);

@@ -1510,11 +1510,15 @@ export const getTestLeaderboard = async (testId: string, currentUserId?: string)
             const maxScore = totalQ * 4;
             const timeTaken = extractNumber(doc.timeTaken);
 
-            // Parse answers to count correct/incorrect
+            // Parse answers and questionTimes
             let answers: Record<string, number> = {};
+            let questionTimes: Record<string, number> = {};
             try {
                 answers = typeof doc.answers === 'string' ? JSON.parse(doc.answers) : (doc.answers || {});
             } catch (e) { answers = {}; }
+            try {
+                questionTimes = typeof doc.questionTimes === 'string' ? JSON.parse(doc.questionTimes) : (doc.questionTimes || {});
+            } catch (e) { questionTimes = {}; }
 
             const answeredCount = Object.keys(answers).length;
             // Score = correct*4 - incorrect*1, so: correct = (score + incorrect) / 4 and incorrect = answered - correct
@@ -1547,6 +1551,8 @@ export const getTestLeaderboard = async (testId: string, currentUserId?: string)
                 percentile,
                 timeTaken,
                 isCurrentUser: doc.userId === currentUserId,
+                answers: doc.userId === currentUserId ? (answers as any) : undefined,
+                questionTimes: doc.userId === currentUserId ? (questionTimes as any) : undefined,
             });
         }
 
@@ -1601,6 +1607,8 @@ export const getTestPerformanceSummary = async (testId: string, currentUserId: s
             highestScore,
             leaderboard,
             userEntry: userRank,
+            answers: userRank?.answers,
+            questionTimes: userRank?.questionTimes,
         };
     } catch (error) {
         console.error("Error getting test performance summary:", error);

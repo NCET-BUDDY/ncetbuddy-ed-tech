@@ -79,6 +79,8 @@ export interface TestRankEntry {
     percentile: number;
     timeTaken: number; // seconds
     isCurrentUser: boolean;
+    answers?: Record<number, number>;
+    questionTimes?: Record<number, number>;
 }
 
 export interface TestPerformanceSummary {
@@ -98,6 +100,8 @@ export interface TestPerformanceSummary {
     highestScore: number;
     leaderboard: TestRankEntry[];
     userEntry: TestRankEntry | null;
+    answers?: Record<number, number>;
+    questionTimes?: Record<number, number>;
 }
 
 export interface QuestionAnalysis {
