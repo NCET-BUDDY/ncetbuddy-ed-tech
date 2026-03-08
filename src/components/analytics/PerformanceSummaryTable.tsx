@@ -54,7 +54,7 @@ export default function PerformanceSummaryTable({ stats }: PerformanceSummaryTab
                 <table className="w-full min-w-[600px]">
                     <thead>
                         <tr className="border-b border-slate-100">
-                            <th className="text-left px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Subject</th>
+                            <th className="text-left px-6 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider">Test Name</th>
                             <th className="text-center px-3 py-3 text-xs font-bold text-orange-500 uppercase tracking-wider">Average<br />Score</th>
                             <th className="text-center px-3 py-3 text-xs font-bold text-emerald-600 uppercase tracking-wider">Attempted<br />Correct</th>
                             <th className="text-center px-3 py-3 text-xs font-bold text-red-500 uppercase tracking-wider">Attempted<br />Wrong</th>
