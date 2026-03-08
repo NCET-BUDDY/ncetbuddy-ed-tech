@@ -388,8 +388,8 @@ function TestReviewContent() {
                         <PremiumScoreCard
                             icon={<Timer size={18} className="text-orange-500" />}
                             label="Time Taken"
-                            value={timeTaken > 60 ? Math.floor(timeTaken / 60) : 0}
-                            unit="min"
+                            value={timeTaken > 0 ? (timeTaken < 60 ? `${timeTaken}` : `${Math.floor(timeTaken / 60)}`) : '—'}
+                            unit={timeTaken > 0 ? (timeTaken < 60 ? 'sec' : 'min') : ''}
                             info="Total time spent on the test"
                             totalSecs={timeTaken}
                         />
