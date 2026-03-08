@@ -1508,7 +1508,19 @@ export const getTestLeaderboard = async (testId: string, currentUserId?: string)
             const doc = sortedResults[i];
             const totalQ = doc.totalQuestions || totalQuestionsFromTest;
             const maxScore = totalQ * 4;
-            const timeTaken = extractNumber(doc.timeTaken);
+
+            // Time calculation with fallback
+            let timeTaken = extractNumber(doc.timeTaken);
+            if (timeTaken <= 0 && doc.questionTimes) {
+                try {
+                    const qTimes = typeof doc.questionTimes === 'string'
+                        ? JSON.parse(doc.questionTimes)
+                        : doc.questionTimes;
+                    if (qTimes && typeof qTimes === 'object') {
+                        timeTaken = Object.values(qTimes).reduce((sum: number, t: any) => sum + (extractNumber(t) || 0), 0);
+                    }
+                } catch (e) { /* ignore */ }
+            }
 
             // Parse answers and questionTimes
             let answers: Record<string, number> = {};
