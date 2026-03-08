@@ -8,6 +8,18 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { LatexRenderer } from "@/components/ui/LatexRenderer";
 import { useAuth } from "@/context/AuthContext";
+import {
+    Timer,
+    TrendingUp,
+    AlertCircle,
+    Info,
+    CheckCircle2,
+    XCircle,
+    Target,
+    Clock,
+    Trophy,
+    BarChart3
+} from "lucide-react";
 
 // Chart.js dynamic import for SSR safety
 import {
@@ -334,6 +346,32 @@ function TestReviewContent() {
                             color="#3B82F6"
                             bgColor="#DBEAFE"
                             subtext={timeTaken > 0 ? formatTime(timeTaken) : '—'}
+                        />
+                    </div>
+
+                    {/* New Premium Metrics Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <PremiumScoreCard
+                            icon={<TrendingUp size={18} className="text-emerald-500" />}
+                            label="Positive Score"
+                            value={String(correctCount * 4)}
+                            max={String(maxScore)}
+                            info="Total marks earned from correct answers"
+                        />
+                        <PremiumScoreCard
+                            icon={<AlertCircle size={18} className="text-red-500" />}
+                            label="Marks Lost"
+                            value={String(incorrectCount)}
+                            max={String(maxScore)}
+                            info="Total marks lost due to negative marking"
+                        />
+                        <PremiumScoreCard
+                            icon={<Timer size={18} className="text-orange-500" />}
+                            label="Time Taken"
+                            value={timeTaken > 60 ? Math.floor(timeTaken / 60) : 0}
+                            unit="min"
+                            info="Total time spent on the test"
+                            totalSecs={timeTaken}
                         />
                     </div>
 
@@ -766,6 +804,43 @@ function ScoreCard({ icon, label, value, color, bgColor, subtext }: {
             <div className="text-2xl md:text-3xl font-black" style={{ color }}>{value}</div>
             <div className="text-[10px] font-black uppercase tracking-widest text-black/50 mt-1">{label}</div>
             <div className="text-[10px] font-bold text-black/40 mt-1">{subtext}</div>
+        </div>
+    );
+}
+
+function PremiumScoreCard({ icon, label, value, max, unit, info, totalSecs }: {
+    icon: React.ReactNode;
+    label: string;
+    value: string | number;
+    max?: string;
+    unit?: string;
+    info: string;
+    totalSecs?: number;
+}) {
+    return (
+        <div className="bg-white rounded-2xl border border-gray-100 p-6 flex flex-col justify-between h-40 group hover:border-indigo-100 hover:shadow-xl transition-all duration-300">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    {icon}
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</span>
+                </div>
+                <div className="relative group/tooltip">
+                    <Info size={16} className="text-slate-300 cursor-help" />
+                    <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-slate-800 text-white text-[10px] rounded shadow-lg opacity-0 pointer-events-none group-hover/tooltip:opacity-100 transition-opacity z-10">
+                        {info}
+                    </div>
+                </div>
+            </div>
+            <div className="mt-4 flex items-baseline gap-1">
+                <span className="text-4xl font-black text-slate-900">{value}</span>
+                {max && <span className="text-xl font-bold text-slate-300">/{max}</span>}
+                {unit && <span className="text-xl font-bold text-slate-400">{unit}</span>}
+            </div>
+            {totalSecs !== undefined && totalSecs > 0 && totalSecs < 60 && (
+                <div className="mt-1 text-[10px] font-bold text-slate-400">
+                    {totalSecs} seconds
+                </div>
+            )}
         </div>
     );
 }
