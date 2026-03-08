@@ -39,6 +39,12 @@ import { Bar, Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend, PointElement, LineElement, Filler);
 
+const extractNumber = (val: any): number => {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') return parseFloat(val) || 0;
+    return 0;
+};
+
 // ─── Utility ──────────────────────────────────────────
 function formatTime(seconds: number): string {
     if (!seconds || seconds <= 0) return '—';
@@ -80,7 +86,7 @@ function TestReviewContent() {
     const [loading, setLoading] = useState(true);
     const [performance, setPerformance] = useState<TestPerformanceSummary | null>(null);
     const [questionAnalysis, setQuestionAnalysis] = useState<QuestionAnalysis[]>([]);
-    const [activeTab, setActiveTab] = useState<'overview' | 'analysis' | 'leaderboard'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'analysis' | 'leaderboard' | 'time'>('overview');
     const [showAllQuestions, setShowAllQuestions] = useState(false);
 
     useEffect(() => {
@@ -185,6 +191,60 @@ function TestReviewContent() {
     const correctCount = test.questions.filter((q, idx) => userAnswers[idx] === q.correctAnswer).length;
     const incorrectCount = Object.keys(userAnswers).length - correctCount;
     const unattempted = totalQuestions - Object.keys(userAnswers).length;
+
+    // Time Analysis Calculations
+    const timeByStatus = {
+        correct: 0,
+        incorrect: 0,
+        unattempted: 0
+    };
+
+    const intervals = [
+        { label: '0-30s', min: 0, max: 30 },
+        { label: '30-60s', min: 30, max: 60 },
+        { label: '60-90s', min: 60, max: 90 },
+        { label: '90-120s', min: 90, max: 120 },
+        { label: '120-150s', min: 120, max: 150 },
+        { label: '150-180s', min: 150, max: 180 },
+        { label: '180s+', min: 180, max: Infinity }
+    ];
+
+    const timeJourneyData = intervals.map(interval => ({
+        label: interval.label,
+        correct: 0,
+        incorrect: 0,
+        unattempted: 0,
+        total: 0
+    }));
+
+    test.questions.forEach((q, idx) => {
+        const time = extractNumber(questionTimes[idx]) || 0;
+        const answer = userAnswers[idx];
+        const isAttempted = answer !== undefined;
+        const isCorrect = isAttempted && answer === q.correctAnswer;
+
+        if (!isAttempted) {
+            timeByStatus.unattempted += time;
+        } else if (isCorrect) {
+            timeByStatus.correct += time;
+        } else {
+            timeByStatus.incorrect += time;
+        }
+
+        // Find interval
+        const intervalIdx = intervals.findIndex(int => time >= int.min && time < int.max);
+        if (intervalIdx !== -1) {
+            if (!isAttempted) timeJourneyData[intervalIdx].unattempted++;
+            else if (isCorrect) timeJourneyData[intervalIdx].correct++;
+            else timeJourneyData[intervalIdx].incorrect++;
+            timeJourneyData[intervalIdx].total++;
+        }
+    });
+
+    const totalCalculatedTime = timeByStatus.correct + timeByStatus.incorrect + timeByStatus.unattempted;
+    const percentCorrect = totalCalculatedTime > 0 ? (timeByStatus.correct / totalCalculatedTime) * 100 : 0;
+    const percentIncorrect = totalCalculatedTime > 0 ? (timeByStatus.incorrect / totalCalculatedTime) * 100 : 0;
+    const percentUnattempted = totalCalculatedTime > 0 ? (timeByStatus.unattempted / totalCalculatedTime) * 100 : 0;
 
     // Chart data
     const breakdownData = {
@@ -312,16 +372,16 @@ function TestReviewContent() {
 
                     {/* Tab Navigation */}
                     <div className="flex gap-1 mt-3 bg-gray-100 rounded-lg p-1">
-                        {(['overview', 'analysis', 'leaderboard'] as const).map(tab => (
+                        {(['overview', 'analysis', 'time', 'leaderboard'] as const).map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`flex-1 py-2 px-3 rounded-md text-xs font-black uppercase tracking-wide transition-all ${activeTab === tab
+                                className={`flex-1 py-2 px-3 rounded-md text-[10px] md:text-xs font-black uppercase tracking-wide transition-all ${activeTab === tab
                                     ? 'bg-black text-white shadow-md'
                                     : 'text-black/50 hover:text-black hover:bg-white'
                                     }`}
                             >
-                                {tab === 'overview' ? '📊 Overview' : tab === 'analysis' ? '🔍 Analysis' : '🏆 Leaderboard'}
+                                {tab === 'overview' ? '📊 Overview' : tab === 'analysis' ? '🔍 Analysis' : tab === 'time' ? '⏱️ Time' : '🏆 Leaderboard'}
                             </button>
                         ))}
                     </div>
@@ -658,6 +718,98 @@ function TestReviewContent() {
                             </button>
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* ─── TAB: TIME ANALYSIS ────────────────────────────────── */}
+            {activeTab === 'time' && (
+                <div className="max-w-6xl mx-auto px-4 py-6 md:py-8 space-y-8 animate-in fade-in duration-500">
+                    {/* Time Summary Row */}
+                    <Card className="p-4 md:p-6 border-3 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                            <div className="flex flex-wrap gap-4">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+                                    <span className="text-[10px] md:text-xs font-bold text-gray-600 uppercase">Correct Qs: {Math.round(timeByStatus.correct / 60)} mins</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <span className="text-[10px] md:text-xs font-bold text-gray-600 uppercase">Incorrect Qs: {Math.round(timeByStatus.incorrect / 60)} mins</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+                                    <span className="text-[10px] md:text-xs font-bold text-gray-600 uppercase">Unattempted Qs: {Math.round(timeByStatus.unattempted / 60)} mins</span>
+                                </div>
+                            </div>
+                            <div className="text-right w-full md:w-auto">
+                                <span className="text-xs font-black text-gray-400 uppercase tracking-widest">Overall Time: </span>
+                                <span className="text-lg font-black text-black">{Math.round(totalCalculatedTime / 60)} mins</span>
+                            </div>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="w-full h-8 bg-gray-100 rounded-lg overflow-hidden flex border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            <div
+                                className="h-full bg-emerald-500 flex items-center justify-center text-[10px] font-black text-white transition-all duration-1000"
+                                style={{ width: `${percentCorrect}%` }}
+                            >
+                                {percentCorrect > 5 && `${Math.round(percentCorrect)}%`}
+                            </div>
+                            <div
+                                className="h-full bg-red-500 flex items-center justify-center text-[10px] font-black text-white transition-all duration-1000"
+                                style={{ width: `${percentIncorrect}%` }}
+                            >
+                                {percentIncorrect > 5 && `${Math.round(percentIncorrect)}%`}
+                            </div>
+                            <div
+                                className="h-full bg-gray-400 flex items-center justify-center text-[10px] font-black text-white transition-all duration-1000"
+                                style={{ width: `${percentUnattempted}%` }}
+                            >
+                                {percentUnattempted > 5 && `${Math.round(percentUnattempted)}%`}
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* Time Journey Table */}
+                    <Card className="border-3 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] bg-white overflow-hidden">
+                        <div className="bg-black text-white px-5 py-4">
+                            <h3 className="font-black uppercase text-sm tracking-wider flex items-center gap-2">
+                                <Clock size={18} className="text-primary" /> Time Journey
+                            </h3>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-100 border-b-2 border-black">
+                                    <tr>
+                                        <th className="p-4 font-black text-[10px] md:text-xs uppercase text-gray-600">Interval</th>
+                                        <th className="p-4 font-black text-[10px] md:text-xs uppercase text-emerald-600 text-center">Correct</th>
+                                        <th className="p-4 font-black text-[10px] md:text-xs uppercase text-red-600 text-center">Incorrect</th>
+                                        <th className="p-4 font-black text-[10px] md:text-xs uppercase text-gray-600 text-right">Overall</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y-2 divide-gray-100">
+                                    {timeJourneyData.map((row, idx) => (
+                                        <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                                            <td className="p-4 font-black text-xs md:text-sm text-gray-800 uppercase">{row.label}</td>
+                                            <td className="p-4 text-center">
+                                                <span className="bg-emerald-50 text-emerald-700 font-bold px-2 md:px-3 py-1 rounded-full border-2 border-emerald-100 text-[10px] md:text-xs">
+                                                    {row.correct} Qs
+                                                </span>
+                                            </td>
+                                            <td className="p-4 text-center">
+                                                <span className="bg-red-50 text-red-700 font-bold px-2 md:px-3 py-1 rounded-full border-2 border-red-100 text-[10px] md:text-xs">
+                                                    {row.incorrect} Qs
+                                                </span>
+                                            </td>
+                                            <td className="p-4 text-right font-black text-xs md:text-sm text-gray-300">
+                                                {row.total} Qs
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </Card>
                 </div>
             )}
 
