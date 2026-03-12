@@ -6,6 +6,7 @@ import { TestimonialsGrid } from "@/components/landing/TestimonialsGrid";
 import { UniversityLogos } from "@/components/landing/UniversityLogos";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { Footer } from "@/components/landing/Footer";
+import { NRTBanner } from "@/components/landing/NRTBanner";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <StatsBar />
+      <NRTBanner />
       <FeaturesGrid />
       <TestimonialsGrid />
       <UniversityLogos />

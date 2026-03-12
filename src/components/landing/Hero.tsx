@@ -49,13 +49,14 @@ export function Hero() {
 
                     {/* Right Column: Illustration */}
                     <div className="relative flex justify-center lg:justify-end">
-                        <div className="relative w-full max-w-[550px] aspect-square bg-[#E8F3F1] rounded-[3rem] overflow-hidden shadow-2xl">
+                        <div className="relative w-full max-w-[550px] aspect-square rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-black/5">
                             <img
-                                src="/hero-illustration.png"
-                                alt="Student Illustration"
-                                className="w-full h-full object-contain p-8"
+                                src="/hero-student.jpg"
+                                alt="Student preparing for NCET"
+                                className="w-full h-full object-cover"
                             />
-                            {/* Visual decorative elements if any from the image can be added here */}
+                            {/* Overlay to soften the image if needed */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-rose-500/10 via-transparent to-transparent pointer-events-none" />
                         </div>
                     </div>
                 </div>

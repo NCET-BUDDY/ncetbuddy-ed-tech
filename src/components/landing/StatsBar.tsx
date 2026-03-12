@@ -2,7 +2,7 @@ import React from 'react';
 
 export const StatsBar = () => {
     const stats = [
-        { label: "ASPIRANTS JOINED", value: "125+" },
+        { label: "ASPIRANTS JOINED", value: "50K+" },
         { label: "SUCCESS RATE", value: "95%" },
         { label: "CURATED CONTENT", value: "EXPERT" },
         { label: "TOP COLLEGES", value: "100+" },
