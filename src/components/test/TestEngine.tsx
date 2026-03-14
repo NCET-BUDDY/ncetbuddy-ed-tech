@@ -30,7 +30,7 @@ export const TestEngine: React.FC<TestEngineProps> = ({ testId }) => {
     const [hasStarted, setHasStarted] = useState(false);
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
     const [activeSubject, setActiveSubject] = useState<string>("");
-    const [optionalSubjectChoice, setOptionalSubjectChoice] = useState<string | null>(null);
+    const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(new Set());
     // Time tracking
     const [questionTimes, setQuestionTimes] = useState<Record<number, number>>({});
     const [questionStartTime, setQuestionStartTime] = useState<number>(0);
@@ -66,33 +66,36 @@ export const TestEngine: React.FC<TestEngineProps> = ({ testId }) => {
 
     const isFullSyllabus = test?.isFullSyllabus && test?.subjectAllocations && test.subjectAllocations.length > 0;
 
-    // Optional Subject Logic (Maths vs Biology)
-    const hasMaths = test?.subjectAllocations?.find(a => a.subject.toLowerCase().includes("math"))?.subject;
-    const hasBiology = test?.subjectAllocations?.find(a => a.subject.toLowerCase().includes("bio"))?.subject;
-    const requiresOptionalChoice = isFullSyllabus && hasMaths && hasBiology;
+    // Modified Selection Logic for Humanities and Science
+    const allAvailableSubjects = test?.subjectAllocations?.map(a => a.subject) || [];
+    const maxChoices = test?.maxSubjectChoices || (isFullSyllabus && allAvailableSubjects.length > 3 ? 3 : 1);
+    
+    // Legacy support for Maths vs Biology (Science)
+    const hasMaths = allAvailableSubjects.find(s => s.toLowerCase().includes("math"));
+    const hasBiology = allAvailableSubjects.find(s => s.toLowerCase().includes("bio"));
+    const isScienceFullMock = isFullSyllabus && hasMaths && hasBiology && allAvailableSubjects.length <= 5;
 
-    // Determine the subject to ignore based on user choice
-    const omittedSubject = requiresOptionalChoice
-        ? (optionalSubjectChoice === hasMaths ? hasBiology : optionalSubjectChoice === hasBiology ? hasMaths : null)
-        : null;
+    const requiresSelection = isFullSyllabus && (test?.maxSubjectChoices || isScienceFullMock);
 
-    // Active allocations excluding the omitted subject
-    const activeAllocations = test?.subjectAllocations?.filter(a => a.subject !== omittedSubject);
+    // Active allocations based on selection
+    const activeAllocations = test?.subjectAllocations?.filter(a => 
+        !requiresSelection || selectedSubjects.has(a.subject)
+    ) || [];
 
     useEffect(() => {
         if (isFullSyllabus && test?.questions[currentQuestionIndex]?.subject) {
             const currentSubj = test.questions[currentQuestionIndex].subject;
-            if (currentSubj !== activeSubject && currentSubj !== omittedSubject) {
+            if (currentSubj !== activeSubject && (selectedSubjects.has(currentSubj as string) || !requiresSelection)) {
                 setActiveSubject(currentSubj as string);
             }
         } else if (isFullSyllabus && activeAllocations && activeAllocations.length > 0 && !activeSubject) {
             setActiveSubject(activeAllocations[0].subject);
         }
-    }, [currentQuestionIndex, isFullSyllabus, test, activeSubject, activeAllocations, omittedSubject]);
+    }, [currentQuestionIndex, isFullSyllabus, test, activeSubject, activeAllocations, selectedSubjects, requiresSelection]);
 
     const getSubjectQuestionIndices = (subject: string) => {
         if (!test) return [];
-        return test.questions.map((q, idx) => q.subject === subject && q.subject !== omittedSubject ? idx : -1).filter(idx => idx !== -1);
+        return test.questions.map((q, idx) => q.subject === subject ? idx : -1).filter(idx => idx !== -1);
     };
 
     const currentPaletteIndices = isFullSyllabus && activeSubject
@@ -100,14 +103,17 @@ export const TestEngine: React.FC<TestEngineProps> = ({ testId }) => {
         : test?.questions.map((_, i) => i) || [];
 
     const validGlobalIndices = test
-        ? test.questions.map((q, idx) => q.subject !== omittedSubject ? idx : -1).filter(idx => idx !== -1)
+        ? test.questions.map((q, idx) => {
+            if (!requiresSelection) return idx;
+            return q.subject && selectedSubjects.has(q.subject) ? idx : -1;
+        }).filter(idx => idx !== -1)
         : [];
 
     const calculateScore = () => {
         if (!test) return 0;
         let score = 0;
         test.questions.forEach((q, index) => {
-            if (q.subject === omittedSubject) return; // Ignore omitted optional subject
+            if (requiresSelection && (!q.subject || !selectedSubjects.has(q.subject))) return;
 
             if (answers[index] === q.correctAnswer) {
                 score += 4;
@@ -386,33 +392,39 @@ export const TestEngine: React.FC<TestEngineProps> = ({ testId }) => {
                         <li>Please ensure you have a stable internet connection.</li>
                     </ul>
 
-                    {requiresOptionalChoice && (
+                    {requiresSelection && (
                         <div className="mb-6 p-4 border border-blue-200 bg-blue-50 rounded-lg">
-                            <h3 className="font-semibold text-lg mb-3">Select your domain subject:</h3>
-                            <p className="text-sm text-gray-600 mb-4">This full mock test contains both Mathematics and Biology. Please select the subject you wish to attempt. The other subject will be omitted from your test and scoring.</p>
-                            <div className="flex gap-4">
-                                <label className="flex items-center gap-2 cursor-pointer bg-white px-4 py-3 rounded border hover:border-blue-400 w-full transition-colors">
-                                    <input
-                                        type="radio"
-                                        name="optionalSubject"
-                                        value={hasMaths}
-                                        checked={optionalSubjectChoice === hasMaths}
-                                        onChange={() => setOptionalSubjectChoice(hasMaths || null)}
-                                        className="w-5 h-5 text-blue-600"
-                                    />
-                                    <span className="font-medium">{hasMaths}</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer bg-white px-4 py-3 rounded border hover:border-blue-400 w-full transition-colors">
-                                    <input
-                                        type="radio"
-                                        name="optionalSubject"
-                                        value={hasBiology}
-                                        checked={optionalSubjectChoice === hasBiology}
-                                        onChange={() => setOptionalSubjectChoice(hasBiology || null)}
-                                        className="w-5 h-5 text-blue-600"
-                                    />
-                                    <span className="font-medium">{hasBiology}</span>
-                                </label>
+                            <h3 className="font-semibold text-lg mb-3">Select your domain subjects ({selectedSubjects.size}/{maxChoices}):</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                {maxChoices === 1 
+                                    ? "Please select the subject you wish to attempt. The other will be omitted." 
+                                    : `Please select exactly ${maxChoices} subjects you wish to attempt from the list below.`}
+                            </p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {allAvailableSubjects.map((subject) => (
+                                    <label key={subject} className={`flex items-center gap-2 cursor-pointer bg-white px-4 py-3 rounded border transition-colors ${selectedSubjects.has(subject) ? 'border-primary bg-primary/5' : 'hover:border-blue-400'}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedSubjects.has(subject)}
+                                            onChange={() => {
+                                                const newSelection = new Set(selectedSubjects);
+                                                if (newSelection.has(subject)) {
+                                                    newSelection.delete(subject);
+                                                } else {
+                                                    if (newSelection.size < maxChoices) {
+                                                        newSelection.add(subject);
+                                                    } else if (maxChoices === 1) {
+                                                        newSelection.clear();
+                                                        newSelection.add(subject);
+                                                    }
+                                                }
+                                                setSelectedSubjects(newSelection);
+                                            }}
+                                            className="w-5 h-5 text-blue-600"
+                                        />
+                                        <span className="font-medium">{subject}</span>
+                                    </label>
+                                ))}
                             </div>
                         </div>
                     )}
@@ -420,11 +432,11 @@ export const TestEngine: React.FC<TestEngineProps> = ({ testId }) => {
                     <div className="flex justify-center">
                         <Button
                             variant="primary"
-                            style={{ backgroundColor: "#FFD02F", color: "black", fontSize: '1.2rem', padding: '10px 30px', opacity: requiresOptionalChoice && !optionalSubjectChoice ? 0.5 : 1 }}
+                            style={{ backgroundColor: "#FFD02F", color: "black", fontSize: '1.2rem', padding: '10px 30px', opacity: requiresSelection && selectedSubjects.size < maxChoices ? 0.5 : 1 }}
                             onClick={startTest}
-                            disabled={!!(requiresOptionalChoice && !optionalSubjectChoice)}
+                            disabled={!!(requiresSelection && selectedSubjects.size < maxChoices)}
                         >
-                            {requiresOptionalChoice && !optionalSubjectChoice ? "Select a subject to begin" : "I am ready to begin"}
+                            {requiresSelection && selectedSubjects.size < maxChoices ? `Select ${maxChoices} subjects to begin` : "I am ready to begin"}
                         </Button>
                     </div>
                 </div>

@@ -28,6 +28,7 @@ export interface Test {
 
     // Full Syllabus feature
     isFullSyllabus?: boolean;
+    maxSubjectChoices?: number; // e.g., for Humanities: 3
     subjectAllocations?: { subject: string; count: number }[];
 }
 

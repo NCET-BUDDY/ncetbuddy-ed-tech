@@ -48,7 +48,8 @@ export default function AdminTestsPage() {
             const success = await updateTest(editingTest.id, {
                 price: editingTest.price,
                 status: editingTest.status,
-                series: editingTest.series // Enable editing stream
+                series: editingTest.series, // Enable editing stream
+                maxSubjectChoices: editingTest.maxSubjectChoices
             });
 
             if (success) {
@@ -152,6 +153,20 @@ export default function AdminTestsPage() {
                                     <option value="Humanities">Humanities</option>
                                     <option value="Commerce">Commerce</option>
                                 </select>
+                            </div>
+
+                            <div>
+                                <label style={{ display: "block", marginBottom: "0.5rem" }}>Max Subject Choices (Optional)</label>
+                                <input
+                                    type="number"
+                                    value={editingTest.maxSubjectChoices || ''}
+                                    onChange={(e) => setEditingTest({ ...editingTest, maxSubjectChoices: parseInt(e.target.value) || undefined })}
+                                    placeholder="e.g. 3 for Humanities"
+                                    style={{ width: "100%", padding: "0.5rem", borderRadius: "0.5rem", border: "1px solid #d1d5db" }}
+                                />
+                                <p style={{ fontSize: "0.75rem", color: "#666", marginTop: "0.25rem" }}>
+                                    If set, students must pick this many subjects from the test's allocations.
+                                </p>
                             </div>
 
                             <div>
