@@ -140,7 +140,8 @@ export default function CreateTestPage() {
             status: testData.status || 'Published',
             isFullSyllabus: testData.isFullSyllabus || false,
             subjectAllocations: testData.isFullSyllabus ? testData.subjectAllocations : undefined,
-            series: testData.series ? testData.series : undefined
+            series: testData.series ? testData.series : undefined,
+            maxSubjectChoices: testData.maxSubjectChoices
         } as any);
 
         if (testId) {
@@ -366,6 +367,29 @@ export default function CreateTestPage() {
                         <option value="Published">Published (Visible to Students)</option>
                         <option value="Draft">Draft (Hidden)</option>
                     </select>
+                </div>
+
+                {/* Max Subject Choices Selection */}
+                <div style={{ marginTop: "1rem" }}>
+                    <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>Max Subject Choices (Optional)</label>
+                    <input
+                        type="number"
+                        placeholder="e.g. 3 for Humanities"
+                        value={testData.maxSubjectChoices || ""}
+                        onChange={(e) => setTestData({ ...testData, maxSubjectChoices: parseInt(e.target.value) || undefined })}
+                        style={{
+                            width: "100%",
+                            padding: "0.75rem",
+                            borderRadius: "8px",
+                            border: "1px solid var(--border)",
+                            backgroundColor: "var(--bg-secondary)",
+                            color: "var(--text-primary)",
+                            fontSize: "1rem"
+                        }}
+                    />
+                    <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
+                        If set, students must pick this many subjects from the allocations before starting.
+                    </p>
                 </div>
             </Card>
 

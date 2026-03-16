@@ -152,15 +152,50 @@ export const getTestById = async (id: string): Promise<Test | null> => {
 export const createTest = async (test: Omit<Test, "id">): Promise<string | null> => {
     if (!isAppwriteConfigured()) return null;
     try {
-        const { questions, subjectAllocations, ...restOfTest } = test;
-        const response = await databases.createDocument(DB_ID, 'tests', ID.unique(), {
+        const { questions, subjectAllocations, maxSubjectChoices, ...restOfTest } = test;
+        
+        const docData: any = {
             ...restOfTest,
             questions: JSON.stringify(questions),
             subjectAllocations: subjectAllocations ? JSON.stringify(subjectAllocations) : undefined,
             createdAt: Math.floor(Date.now() / 1000),
-            isVisible: test.isVisible !== undefined ? test.isVisible : true // Default to visible
-        });
-        return response.$id;
+            isVisible: test.isVisible !== undefined ? test.isVisible : true
+        };
+
+        // Only add if explicitly provided to avoid schema issues
+        if (maxSubjectChoices !== undefined) {
+            docData.maxSubjectChoices = maxSubjectChoices;
+        }
+
+        try {
+            const response = await databases.createDocument(DB_ID, 'tests', ID.unique(), docData);
+            return response.$id;
+        } catch (initialError: any) {
+            console.error("Initial createTest failed:", initialError);
+            
+            // Fallback strategy: try removing newer or non-essential fields
+            const possibleProblemFields = ['maxSubjectChoices', 'isVisible', 'subjectAllocations'];
+            let attemptedFallback = false;
+            
+            for (const field of possibleProblemFields) {
+                if (field in docData && (initialError.code === 400 || initialError.message?.toLowerCase().includes('attribute not found'))) {
+                    console.warn(`Field '${field}' likely missing in schema, retrying without it...`);
+                    delete docData[field];
+                    attemptedFallback = true;
+                }
+            }
+
+            if (attemptedFallback) {
+                try {
+                    const response = await databases.createDocument(DB_ID, 'tests', ID.unique(), docData);
+                    return response.$id;
+                } catch (retryError: any) {
+                    console.error("Fallback createTest also failed:", retryError);
+                    throw retryError;
+                }
+            }
+            throw initialError;
+        }
     } catch (error) {
         console.error("Error creating test:", error);
         return null;
@@ -180,8 +215,37 @@ export const deleteTest = async (testId: string): Promise<boolean> => {
 export const updateTest = async (testId: string, data: Partial<Test>): Promise<boolean> => {
     try {
         const { id, ...updateData } = data; // Remove ID from payload if present
-        await databases.updateDocument(DB_ID, 'tests', testId, updateData);
-        return true;
+        
+        try {
+            await databases.updateDocument(DB_ID, 'tests', testId, updateData);
+            return true;
+        } catch (initialError: any) {
+            console.error("Initial updateTest failed:", initialError);
+            
+            // Fallback strategy: try removing newer or non-essential fields
+            const possibleProblemFields = ['maxSubjectChoices', 'isVisible', 'subjectAllocations'];
+            let attemptedFallback = false;
+            const fallbackData = { ...updateData };
+            
+            for (const field of possibleProblemFields) {
+                if (field in fallbackData && (initialError.code === 400 || initialError.message?.toLowerCase().includes('attribute not found'))) {
+                    console.warn(`Field '${field}' likely missing in schema during update, retrying without it...`);
+                    delete (fallbackData as any)[field];
+                    attemptedFallback = true;
+                }
+            }
+
+            if (attemptedFallback) {
+                try {
+                    await databases.updateDocument(DB_ID, 'tests', testId, fallbackData);
+                    return true;
+                } catch (retryError: any) {
+                    console.error("Fallback updateTest also failed:", retryError);
+                    throw retryError;
+                }
+            }
+            throw initialError;
+        }
     } catch (error) {
         console.error("Error updating test:", error);
         return false;
