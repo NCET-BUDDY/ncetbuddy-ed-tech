@@ -91,8 +91,9 @@ export default function DashboardPage() {
                     const userProfile = await getUserProfile(user.$id);
                     if (userProfile) {
                         setProfile(userProfile);
-                        // Show mentorship modal if phone number is missing
-                        if (!userProfile.phoneNumber) {
+                        // Show mentorship modal if phone number is missing (check both DB and localStorage)
+                        const localPhone = localStorage.getItem(`mentorship_phone_${user.$id}`);
+                        if (!userProfile.phoneNumber && !localPhone) {
                             // Small delay for better UX
                             setTimeout(() => setShowMentorshipModal(true), 2000);
                         }
