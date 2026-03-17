@@ -75,11 +75,11 @@ export default function MentorshipModal({ userProfile, onClose, onUpdate }: Ment
                     </div>
 
                     <h2 className="text-3xl font-bold text-white mb-4">
-                        Grow Faster with <span className="text-amber-400">1:1 Mentorship</span>
+                        Want to get into your <span className="text-amber-400">Dream College?</span>
                     </h2>
                     
                     <p className="text-white/70 mb-8 text-sm leading-relaxed">
-                        Join our exclusive WhatsApp group to get direct guidance from experts, topper strategies, and real-time doubt clearing.
+                        Lacking in guidance? Confused about what to study or skip? Join our VIP mentorship for a structured path to your goal.
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-4 text-left">
