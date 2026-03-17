@@ -154,22 +154,32 @@ export const createTest = async (test: Omit<Test, "id">): Promise<{ id?: string,
     try {
         const { questions, subjectAllocations, maxSubjectChoices, isFullSyllabus, isVisible, ...restOfTest } = test;
         
+        // Build the document data EXPLICITLY
         const docData: any = {
-            ...restOfTest,
+            title: test.title,
+            subject: test.subject || "General",
+            duration: test.duration || 60,
             questions: JSON.stringify(questions),
             createdAt: Math.floor(Date.now() / 1000),
+            createdBy: test.createdBy || "admin",
+            isVisible: true // Force true for now to debug
         };
 
-        // Explicitly set default fields
-        docData.isVisible = isVisible !== undefined ? isVisible : true;
-
-        // Add optional/new fields if provided
+        // Add optional fields only if they exist in the incoming test object
+        if (test.status) docData.status = test.status;
+        if (test.testType) docData.testType = test.testType;
+        if (test.pyqSubject) docData.pyqSubject = test.pyqSubject;
+        if (test.price !== undefined) docData.price = test.price;
+        if (test.series) docData.series = test.series;
+        if (test.isFullSyllabus !== undefined) docData.isFullSyllabus = test.isFullSyllabus;
+        if (test.maxSubjectChoices !== undefined) docData.maxSubjectChoices = test.maxSubjectChoices;
         if (subjectAllocations) docData.subjectAllocations = JSON.stringify(subjectAllocations);
-        if (maxSubjectChoices !== undefined) docData.maxSubjectChoices = maxSubjectChoices;
-        if (isFullSyllabus !== undefined) docData.isFullSyllabus = isFullSyllabus;
+
+        // If isVisible was explicitly passed, use it, otherwise stay with forced true
+        if (isVisible !== undefined) docData.isVisible = isVisible;
 
         try {
-            console.log("Attempting to create test with data:", docData);
+            console.log("Final docData keys:", Object.keys(docData));
             const response = await databases.createDocument(DB_ID, 'tests', ID.unique(), docData);
             return { id: response.$id };
         } catch (initialError: any) {
@@ -212,12 +222,14 @@ export const createTest = async (test: Omit<Test, "id">): Promise<{ id?: string,
                         return { id: response.$id };
                     } catch (retryError: any) {
                         console.error("Fallback createTest failed too:", retryError);
-                        return { error: retryError.message || "Fallback creation failed" };
+                        const fallbackKeys = Object.keys(fallbackData).join(', ');
+                        return { error: (retryError.message || "Fallback failed") + " | Keys: " + fallbackKeys };
                     }
                 }
             }
             
-            return { error: initialError.message || "Creation failed" };
+            const currentKeys = Object.keys(docData).join(', ');
+            return { error: (initialError.message || "Creation failed") + " | Keys: " + currentKeys };
         }
     } catch (error: any) {
         console.error("Error in createTest wrapper:", error);
