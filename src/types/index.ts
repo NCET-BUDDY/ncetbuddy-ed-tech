@@ -172,6 +172,7 @@ export interface UserProfile {
     dailyGoal?: string;
     dailyProgress?: number;
     dailyGoalTarget?: number;
+    stream?: string; // e.g., 'Science', 'Commerce', 'Arts/Humanities'
     createdAt?: number;
 }
 

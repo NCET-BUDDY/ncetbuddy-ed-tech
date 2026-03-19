@@ -120,30 +120,36 @@ function EducatorTestsList() {
                     const purchasedMap: Record<string, boolean> = {};
                     const filteredTests = premiumTests.filter(test => {
                         const isNRT = test.title.toUpperCase().includes('NRT');
-                        const isGateway = test.title.toUpperCase().includes('NRT 1') || 
-                                         test.title.toUpperCase().includes('NRT DEMO');
+                        const isNRT1 = test.title.toUpperCase().includes('NRT 1') || test.title.toUpperCase() === 'NRT 1';
+                        const isNRTDemo = test.title.toUpperCase().includes('NRT DEMO');
                         
                         // Access rules:
                         const hasDirectPurchase = purchasedProductNames.has(test.title) || 
                                                (test.series && purchasedProductNames.has(test.series));
                         
                         const unlockedByBundle = isNRT && hasAnyNRTPurchase;
-                        const isAlwaysUnlocked = isGateway && (test.price === 0 || !test.price);
+                        
+                        // Domain-specific free access for NRT DEMO
+                        const isProfileScience = (profile as any)?.stream === 'Science';
+                        const isNRTDemoFree = isNRTDemo && isProfileScience;
                         
                         purchasedMap[test.id] = isAdmin || 
                                               hasGlobalPremium || 
                                               hasDirectPurchase || 
                                               unlockedByBundle ||
-                                              isAlwaysUnlocked;
+                                              isNRTDemoFree;
 
                         // Visibility rule:
                         // 1. If not NRT, always show.
                         // 2. If NRT:
-                        //    - Show if it's a gateway test (NRT 1, NRT DEMO).
+                        //    - Show if it's NRT 1 (gateway).
+                        //    - Show if it's NRT DEMO AND user is Science stream.
                         //    - Show if it's already purchased/unlocked.
                         //    - Show if user is admin.
                         if (!isNRT) return true;
-                        return isGateway || purchasedMap[test.id] || isAdmin;
+                        
+                        const shouldShowDemo = isNRTDemo && isProfileScience;
+                        return isNRT1 || shouldShowDemo || purchasedMap[test.id] || isAdmin;
                     });
 
                     setTests(filteredTests);

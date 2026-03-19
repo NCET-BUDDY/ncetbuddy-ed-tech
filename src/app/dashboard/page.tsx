@@ -120,14 +120,20 @@ export default function DashboardPage() {
                 const processedTests = (fetchedTests.length > 0 ? fetchedTests : MOCK_TESTS)
                     .filter(t => {
                         const isNRT = t.title.toUpperCase().includes('NRT');
-                        const isGateway = t.title.toUpperCase().includes('NRT 1') || 
-                                         t.title.toUpperCase().includes('NRT DEMO');
-                        
+                        const isNRT1 = t.title.toUpperCase().includes('NRT 1');
+                        const isNRTDemo = t.title.toUpperCase().includes('NRT DEMO');
+                        const isProfileScience = (profile as any)?.stream === 'Science';
+
                         // Visibility rule:
                         // 1. If not NRT, show.
-                        // 2. If NRT: Show if it's a gateway (NRT 1, NRT DEMO) OR user has purchased bundle OR is admin.
+                        // 2. If NRT: 
+                        //    - Show if it's NRT 1 (gateway/paid).
+                        //    - Show if it's NRT DEMO AND user is Science stream profile.
+                        //    - Show if user has purchased NRT bundle OR is admin.
                         if (!isNRT) return true;
-                        return isGateway || hasAnyNRTPurchase || isAdmin;
+                        
+                        const isUnlocked = hasAnyNRTPurchase || isAdmin || (isNRTDemo && isProfileScience);
+                        return isNRT1 || (isNRTDemo && isProfileScience) || isUnlocked;
                     })
                     .map(t => ({
                         ...t,

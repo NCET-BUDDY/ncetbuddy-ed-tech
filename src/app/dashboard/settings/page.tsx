@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from "@/context/AuthContext";
+import { getUserProfile, updateUser } from '@/lib/appwrite-db';
+import { UserProfile } from '@/types';
 import {
     User,
     Lock,
@@ -22,6 +24,25 @@ export default function SettingsPage() {
     const { user } = useAuth();
     const [activeSection, setActiveSection] = useState<SettingSection>('profile');
     const [isSaving, setIsSaving] = useState(false);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [displayName, setDisplayName] = useState("");
+    const [stream, setStream] = useState("Science");
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            if (user?.$id) {
+                const data = await getUserProfile(user.$id);
+                if (data) {
+                    setProfile(data);
+                    setDisplayName(data.displayName || user.name || "");
+                    setStream(data.stream || "Science");
+                } else if (user.name) {
+                    setDisplayName(user.name);
+                }
+            }
+        };
+        fetchProfile();
+    }, [user]);
 
     const sidebarItems = [
         { id: 'profile', label: 'My Profile', icon: <User size={20} /> },
@@ -30,9 +51,28 @@ export default function SettingsPage() {
         { id: 'appearance', label: 'Appearance', icon: <Palette size={20} /> },
     ];
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        if (!user?.$id) return;
         setIsSaving(true);
-        setTimeout(() => setIsSaving(false), 1500);
+        try {
+            const result = await updateUser(user.$id, {
+                displayName: displayName,
+                stream: stream
+            });
+            if (result.success) {
+                alert("Profile updated successfully!");
+                // Refresh profile data
+                const updated = await getUserProfile(user.$id);
+                if (updated) setProfile(updated);
+            } else {
+                throw new Error(result.error || "Update unsuccessful");
+            }
+        } catch (error) {
+            console.error("Error saving settings:", error);
+            alert("Failed to save settings. Please try again.");
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     return (
@@ -93,8 +133,8 @@ export default function SettingsPage() {
                                             </button>
                                         </div>
                                         <div className="text-center md:text-left">
-                                            <h3 className="text-xl font-bold text-slate-900 mb-1">{user?.name || "Arjun Mehta"}</h3>
-                                            <p className="text-slate-500 text-sm mb-4">Science Stream • NCET Aspirant</p>
+                                            <h3 className="text-xl font-bold text-slate-900 mb-1">{displayName || user?.name || "Student"}</h3>
+                                            <p className="text-slate-500 text-sm mb-4">{stream} Stream • NCET Aspirant</p>
                                             <button className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">
                                                 Change Avatar
                                             </button>
@@ -106,7 +146,8 @@ export default function SettingsPage() {
                                             <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
                                             <input
                                                 type="text"
-                                                defaultValue={user?.name || "Arjun Mehta"}
+                                                value={displayName}
+                                                onChange={(e) => setDisplayName(e.target.value)}
                                                 className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm focus:ring-2 focus:ring-rose-500/20 transition-all outline-none font-bold"
                                             />
                                         </div>
@@ -120,10 +161,14 @@ export default function SettingsPage() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Academic Stream</label>
-                                            <select className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm focus:ring-2 focus:ring-rose-500/20 transition-all outline-none font-bold appearance-none">
-                                                <option>Science</option>
-                                                <option>Commerce</option>
-                                                <option>Arts/Humanities</option>
+                                            <select 
+                                                value={stream}
+                                                onChange={(e) => setStream(e.target.value)}
+                                                className="w-full bg-slate-50 border-none rounded-2xl py-4 px-6 text-sm focus:ring-2 focus:ring-rose-500/20 transition-all outline-none font-bold appearance-none"
+                                            >
+                                                <option value="Science">Science</option>
+                                                <option value="Commerce">Commerce</option>
+                                                <option value="Arts/Humanities">Arts/Humanities</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2">
