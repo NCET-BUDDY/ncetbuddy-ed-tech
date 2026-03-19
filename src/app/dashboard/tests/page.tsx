@@ -118,21 +118,32 @@ function EducatorTestsList() {
                     const hasGlobalPremium = (profile as any)?.premiumStatus === true;
 
                     const purchasedMap: Record<string, boolean> = {};
-                    premiumTests.forEach(test => {
+                    const filteredTests = premiumTests.filter(test => {
                         const isNRT = test.title.toUpperCase().includes('NRT');
+                        const isNRT1 = test.title.toUpperCase().includes('NRT 1') || test.title.toUpperCase() === 'NRT 1';
                         
                         // Access rules:
-                        // 1. Admin or Global Premium user
-                        // 2. Exact match on title or series
-                        // 3. NRT Bundle rule (any NRT purchase unlocks all NRT)
                         const hasDirectPurchase = purchasedProductNames.has(test.title) || 
                                                (test.series && purchasedProductNames.has(test.series));
+                        
+                        const unlockedByBundle = isNRT && hasAnyNRTPurchase;
                         
                         purchasedMap[test.id] = isAdmin || 
                                               hasGlobalPremium || 
                                               hasDirectPurchase || 
-                                              (isNRT && hasAnyNRTPurchase);
+                                              unlockedByBundle;
+
+                        // Visibility rule:
+                        // 1. If not NRT, always show.
+                        // 2. If NRT:
+                        //    - Show if it's NRT 1 (gateway).
+                        //    - Show if it's already purchased/unlocked.
+                        //    - Show if user is admin.
+                        if (!isNRT) return true;
+                        return isNRT1 || purchasedMap[test.id] || isAdmin;
                     });
+
+                    setTests(filteredTests);
                     setPurchasedTests(purchasedMap);
                 }
             } catch (error) {

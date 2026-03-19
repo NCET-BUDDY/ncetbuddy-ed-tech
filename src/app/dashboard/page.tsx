@@ -3,7 +3,7 @@
 import React from 'react';
 import BannerCarousel from '@/components/dashboard/BannerCarousel';
 import { useEffect, useState } from 'react';
-import { getBooks, getFormulaCards, getTests, getForumPosts, getDailyProgress, getUserTestResults, getDynamicPlannerTask, PlannerTask, getVideoClasses, markTaskDone, getUserProfile } from '@/lib/appwrite-db';
+import { getBooks, getFormulaCards, getTests, getForumPosts, getDailyProgress, getUserTestResults, getDynamicPlannerTask, PlannerTask, getVideoClasses, markTaskDone, getUserProfile, getUserPayments } from '@/lib/appwrite-db';
 import { Test, ForumPost, Book, FormulaCard, VideoClass, UserProfile } from '@/types';
 import MentorshipModal from '@/components/mentorship/MentorshipModal';
 import {
@@ -86,11 +86,20 @@ export default function DashboardPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch User Profile
+                // Fetch User Profile & Payments
+                let hasAnyNRTPurchase = false;
+                let isAdmin = false;
+
                 if (user?.$id) {
-                    const userProfile = await getUserProfile(user.$id);
+                    const [userProfile, userPayments] = await Promise.all([
+                        getUserProfile(user.$id),
+                        getUserPayments(user.$id)
+                    ]);
+
                     if (userProfile) {
                         setProfile(userProfile);
+                        isAdmin = (userProfile as any).role === 'admin';
+                        
                         // Show mentorship modal if phone number is missing (check both DB and localStorage)
                         const localPhone = localStorage.getItem(`mentorship_phone_${user.$id}`);
                         if (!userProfile.phoneNumber && !localPhone) {
@@ -98,18 +107,35 @@ export default function DashboardPage() {
                             setTimeout(() => setShowMentorshipModal(true), 2000);
                         }
                     }
+
+                    if (userPayments) {
+                        hasAnyNRTPurchase = userPayments.some((p: any) => 
+                            p.status === 'Credit' && (p.productName || "").toUpperCase().includes('NRT')
+                        );
+                    }
                 }
 
                 // Fetch Tests
                 const fetchedTests = await getTests();
-                const processedTests = (fetchedTests.length > 0 ? fetchedTests : MOCK_TESTS).map(t => ({
-                    ...t,
-                    duration: t.duration || 180,
-                    questionsCount: t.questions?.length || 0,
-                    href: t.id.startsWith('demo-') ? `/dashboard/tests` : 
-                          (t.title.toUpperCase().includes('NRT') ? `/dashboard/tests/attempt?id=${t.id}` : 
-                          (t.testType === 'pyq' ? `/dashboard/tests/pyq/${t.pyqSubject || 'non-domain'}` : `/dashboard/tests/attempt?id=${t.id}`))
-                }));
+                const processedTests = (fetchedTests.length > 0 ? fetchedTests : MOCK_TESTS)
+                    .filter(t => {
+                        const isNRT = t.title.toUpperCase().includes('NRT');
+                        const isNRT1 = t.title.toUpperCase().includes('NRT 1') || t.title.toUpperCase() === 'NRT 1';
+                        
+                        // Visibility rule:
+                        // 1. If not NRT, show.
+                        // 2. If NRT: Show if it's NRT 1 (gateway) OR user has purchased bundle OR is admin.
+                        if (!isNRT) return true;
+                        return isNRT1 || hasAnyNRTPurchase || isAdmin;
+                    })
+                    .map(t => ({
+                        ...t,
+                        duration: t.duration || 180,
+                        questionsCount: t.questions?.length || 0,
+                        href: t.id.startsWith('demo-') ? `/dashboard/tests` : 
+                              (t.title.toUpperCase().includes('NRT') ? `/dashboard/tests/attempt?id=${t.id}` : 
+                              (t.testType === 'pyq' ? `/dashboard/tests/pyq/${t.pyqSubject || 'non-domain'}` : `/dashboard/tests/attempt?id=${t.id}`))
+                    }));
                 setTests(processedTests);
 
                 // Fetch Forum Posts for Community Discussion

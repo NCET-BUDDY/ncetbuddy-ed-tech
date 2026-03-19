@@ -90,7 +90,7 @@ export default function EditTestPage() {
                 series: testData.series || undefined,
                 testType: testData.testType || 'pyq',
                 pyqSubject: testData.pyqSubject || 'non-domain',
-                price: Number(testData.price) || 0,
+                price: (testData.price !== undefined && !isNaN(Number(testData.price))) ? Number(testData.price) : 0,
                 questions: JSON.stringify(questions.map((q, i) => ({ ...q, id: `q-${i + 1}` })))
             });
             alert("Test updated successfully!");
