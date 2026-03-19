@@ -22,7 +22,7 @@ import { Card } from "@/components/ui/Card";
 import Link from "next/link";
 import { PYQSubject, Test, Purchase } from "@/types";
 import { useEffect, useState } from "react";
-import { getTests, hasUserPaidForProduct } from "@/lib/appwrite-db";
+import { getTests, hasUserPaidForProduct, getUserPayments, getUserProfile } from "@/lib/appwrite-db";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PenLine, BookOpen, Microscope, Briefcase, Target, GraduationCap, Users } from "lucide-react";
@@ -102,18 +102,37 @@ function EducatorTestsList() {
                 setTests(premiumTests);
 
                 if (user) {
+                    // Optimized: Fetch all payments once
+                    const [payments, profile] = await Promise.all([
+                        getUserPayments(user.$id),
+                        getUserProfile(user.$id)
+                    ]);
+                    
+                    const successfulPayments = payments.filter((p: any) => p.status === 'Credit');
+                    const purchasedProductNames = new Set(successfulPayments.map((p: any) => p.productName));
+                    const hasAnyNRTPurchase = successfulPayments.some((p: any) => 
+                        (p.productName || "").toUpperCase().includes('NRT')
+                    );
+                    
+                    const isAdmin = (profile as any)?.role === 'admin';
+                    const hasGlobalPremium = (profile as any)?.premiumStatus === true;
+
                     const purchasedMap: Record<string, boolean> = {};
-                    // Check payment status for each premium test individually
-                    await Promise.all(premiumTests.map(async (test) => {
-                        // For domain tests, if bought the series, unlock all
-                        const storedDomain = localStorage.getItem('selected_nrt_domain');
-                        let productNameToCheck = test.series ? test.series : test.title;
+                    premiumTests.forEach(test => {
+                        const isNRT = test.title.toUpperCase().includes('NRT');
                         
-                        // If test has no explicit series but we are in a domain view, we could check domain bundle
-                        // For now we check the assigned series first
-                        const hasPaidForThis = await hasUserPaidForProduct(user.$id, productNameToCheck);
-                        purchasedMap[test.id] = hasPaidForThis;
-                    }));
+                        // Access rules:
+                        // 1. Admin or Global Premium user
+                        // 2. Exact match on title or series
+                        // 3. NRT Bundle rule (any NRT purchase unlocks all NRT)
+                        const hasDirectPurchase = purchasedProductNames.has(test.title) || 
+                                               (test.series && purchasedProductNames.has(test.series));
+                        
+                        purchasedMap[test.id] = isAdmin || 
+                                              hasGlobalPremium || 
+                                              hasDirectPurchase || 
+                                              (isNRT && hasAnyNRTPurchase);
+                    });
                     setPurchasedTests(purchasedMap);
                 }
             } catch (error) {

@@ -31,12 +31,28 @@ export async function GET(request: Request) {
         }
 
         // 2. Fallback: check actual payment records
-
-        const response = await databases.listDocuments(DB_ID, 'payments', [
+        
+        // Special logic for NRT: If product is NRT-related, ANY NRT purchase unlocks ALL NRT tests
+        const isNRT = productName.toUpperCase().includes('NRT');
+        
+        const queries = [
             Query.equal('userId', userId),
-            Query.equal('productName', productName),
             Query.equal('status', 'Credit')
-        ]);
+        ];
+
+        if (!isNRT) {
+            queries.push(Query.equal('productName', productName));
+        }
+
+        const response = await databases.listDocuments(DB_ID, 'payments', queries);
+
+        if (isNRT) {
+            // Filter results to find ANY NRT payment if requested product is NRT
+            const hasAnyNRTPayment = response.documents.some(doc => 
+                (doc.productName || "").toUpperCase().includes('NRT')
+            );
+            return NextResponse.json({ hasAccess: hasAnyNRTPayment });
+        }
 
         return NextResponse.json({ hasAccess: response.documents.length > 0 });
     } catch (error: any) {
