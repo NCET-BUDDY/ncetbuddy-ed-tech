@@ -19,7 +19,10 @@ export default function AdminTestsPage() {
     const fetchTests = async () => {
         try {
             const data = await getTests();
-            const educatorTests = data.filter(t => t.testType === 'educator');
+            const educatorTests = data.filter(t => 
+                t.testType === 'educator' || 
+                t.title.toUpperCase().includes('NRT')
+            );
             setTests(educatorTests);
         } catch (error) {
             console.error("Error fetching tests:", error);
