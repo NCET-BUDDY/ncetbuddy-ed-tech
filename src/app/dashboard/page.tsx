@@ -120,13 +120,14 @@ export default function DashboardPage() {
                 const processedTests = (fetchedTests.length > 0 ? fetchedTests : MOCK_TESTS)
                     .filter(t => {
                         const isNRT = t.title.toUpperCase().includes('NRT');
-                        const isNRT1 = t.title.toUpperCase().includes('NRT 1') || t.title.toUpperCase() === 'NRT 1';
+                        const isGateway = t.title.toUpperCase().includes('NRT 1') || 
+                                         t.title.toUpperCase().includes('NRT DEMO');
                         
                         // Visibility rule:
                         // 1. If not NRT, show.
-                        // 2. If NRT: Show if it's NRT 1 (gateway) OR user has purchased bundle OR is admin.
+                        // 2. If NRT: Show if it's a gateway (NRT 1, NRT DEMO) OR user has purchased bundle OR is admin.
                         if (!isNRT) return true;
-                        return isNRT1 || hasAnyNRTPurchase || isAdmin;
+                        return isGateway || hasAnyNRTPurchase || isAdmin;
                     })
                     .map(t => ({
                         ...t,

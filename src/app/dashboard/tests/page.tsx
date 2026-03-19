@@ -120,27 +120,30 @@ function EducatorTestsList() {
                     const purchasedMap: Record<string, boolean> = {};
                     const filteredTests = premiumTests.filter(test => {
                         const isNRT = test.title.toUpperCase().includes('NRT');
-                        const isNRT1 = test.title.toUpperCase().includes('NRT 1') || test.title.toUpperCase() === 'NRT 1';
+                        const isGateway = test.title.toUpperCase().includes('NRT 1') || 
+                                         test.title.toUpperCase().includes('NRT DEMO');
                         
                         // Access rules:
                         const hasDirectPurchase = purchasedProductNames.has(test.title) || 
                                                (test.series && purchasedProductNames.has(test.series));
                         
                         const unlockedByBundle = isNRT && hasAnyNRTPurchase;
+                        const isAlwaysUnlocked = isGateway && (test.price === 0 || !test.price);
                         
                         purchasedMap[test.id] = isAdmin || 
                                               hasGlobalPremium || 
                                               hasDirectPurchase || 
-                                              unlockedByBundle;
+                                              unlockedByBundle ||
+                                              isAlwaysUnlocked;
 
                         // Visibility rule:
                         // 1. If not NRT, always show.
                         // 2. If NRT:
-                        //    - Show if it's NRT 1 (gateway).
+                        //    - Show if it's a gateway test (NRT 1, NRT DEMO).
                         //    - Show if it's already purchased/unlocked.
                         //    - Show if user is admin.
                         if (!isNRT) return true;
-                        return isNRT1 || purchasedMap[test.id] || isAdmin;
+                        return isGateway || purchasedMap[test.id] || isAdmin;
                     });
 
                     setTests(filteredTests);
