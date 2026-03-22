@@ -20,8 +20,8 @@
 .dark {
   --background: #020617; /* Slate 950 - Blackish */
   --foreground: #F8FAFC; /* Slate 50 */
-  --primary: #38bdf8;    /* Sky 400 - Radiant Blue */
-  --primary-hover: #0ea5e9; /* Sky 500 */
+  --primary: #E11D48;    /* Rose 600 - Thick Red */
+  --primary-hover: #BE123C; /* Rose 700 */
   --card-bg: #0f172a;    /* Slate 900 - Dark Navy */
   --text-secondary: #94A3B8; /* Slate 400 */
   --error: #F43F5E;

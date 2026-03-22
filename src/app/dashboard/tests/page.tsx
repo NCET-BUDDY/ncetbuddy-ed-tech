@@ -278,7 +278,7 @@ function EducatorTestsList() {
             }}>
                 <DialogContent className="sm:max-w-md" hideCloseButton>
                     <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold text-center">Select Your Domain</DialogTitle>
+                        <DialogTitle className="text-2xl font-black text-center text-primary uppercase tracking-tight">Select Your Domain</DialogTitle>
                     </DialogHeader>
                     <div className="py-4">
                         <p className="text-center text-foreground/70 mb-6">
@@ -295,19 +295,19 @@ function EducatorTestsList() {
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${tempDomain === domain.id ? 'border-primary' : 'border-slate-300'}`}>
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${tempDomain === domain.id ? 'border-primary' : 'border-border'}`}>
                                             {tempDomain === domain.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                                         </div>
                                         <div>
-                                            <h4 className="font-bold">{domain.label}</h4>
-                                            <p className="text-xs text-foreground/70">{domain.description}</p>
+                                            <h4 className={`font-black uppercase tracking-tight ${tempDomain === domain.id ? 'text-primary' : 'text-foreground'}`}>{domain.label}</h4>
+                                            <p className="text-xs text-secondary">{domain.description}</p>
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                         <Button
-                            className="w-full mt-6 py-6 text-lg"
+                            className="w-full mt-6 py-6 text-lg font-black uppercase tracking-widest bg-primary text-white hover:bg-primary-hover shadow-xl shadow-primary/20"
                             onClick={handleDomainSubmit}
                             disabled={!tempDomain}
                         >
@@ -391,7 +391,7 @@ function EducatorTestsList() {
                         <div className="flex flex-col h-full">
                             <div className="flex items-center justify-between mb-4">
                                 <GraduationCap size={40} className="text-primary" />
-                                <span className={`px-3 py-1 text-xs font-bold text-white rounded-full ${(!test.price || test.price <= 0) ? 'bg-blue-600' : 'bg-green-600'}`}>
+                                <span className={`px-3 py-1 text-xs font-bold text-white rounded-full ${(!test.price || test.price <= 0) ? 'bg-primary' : 'bg-primary/20'}`}>
                                     {(!test.price || test.price <= 0) ? 'FREE' : `₹${test.price}`}
                                 </span>
                             </div>
@@ -415,7 +415,7 @@ function EducatorTestsList() {
                                         onClick={() => handleBuyNow(test)}
                                         disabled={purchasingId === test.id}
                                         className={`w-full py-2 font-bold rounded-lg transition-colors disabled:opacity-50 ${(!test.price || test.price <= 0)
-                                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                            ? 'bg-primary hover:bg-primary-hover text-white'
                                             : 'bg-black hover:bg-gray-800 text-white'
                                             }`}
                                     >
