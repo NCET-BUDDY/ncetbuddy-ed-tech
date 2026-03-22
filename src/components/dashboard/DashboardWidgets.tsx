@@ -259,36 +259,40 @@ export const PerformanceAnalytics = ({ score, trend, history = [] }: { score: nu
                     <div>
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-sm font-black text-foreground">Score Trend</h3>
-                            <div className="text-[10px] font-bold text-secondary/40 bg-slate-50 px-2 py-1 rounded-md border border-border">
+                            <div className="text-[10px] font-bold text-secondary bg-background px-2 py-1 rounded-md border border-border">
                                 Last 30 Days ▾
                             </div>
                         </div>
 
                         {/* Improved Responsive SVG Trendline */}
-                        <div className="h-24 w-full relative group bg-slate-50/50 rounded-xl p-2">
+                        <div className="h-28 w-full relative group bg-background/50 rounded-2xl p-3 border border-border/50">
                             <svg
                                 className="w-full h-full"
                                 viewBox="0 0 500 100"
                                 preserveAspectRatio="none"
                             >
+                                <defs>
+                                    <linearGradient id="gradient-fixed" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.3" />
+                                        <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+                                    </linearGradient>
+                                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feGaussianBlur stdDeviation="2" result="blur" />
+                                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                    </filter>
+                                </defs>
                                 <path
                                     d={fillPathString}
                                     fill="url(#gradient-fixed)"
-                                    fillOpacity="0.1"
                                 />
                                 <path
                                     d={pathString}
                                     fill="none"
-                                    stroke="#E11D48"
+                                    stroke="var(--primary)"
                                     strokeWidth="3"
                                     strokeLinecap="round"
+                                    filter="url(#glow)"
                                 />
-                                <defs>
-                                    <linearGradient id="gradient-fixed" x1="0%" y1="0%" x2="0%" y2="100%">
-                                        <stop offset="0%" stopColor="#E11D48" />
-                                        <stop offset="100%" stopColor="transparent" />
-                                    </linearGradient>
-                                </defs>
                             </svg>
                             <div className="flex justify-between px-1 mt-2 text-[8px] font-bold text-slate-300 uppercase tracking-tighter">
                                 <span>Week 1</span>
