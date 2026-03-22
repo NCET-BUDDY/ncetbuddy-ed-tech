@@ -294,18 +294,18 @@ export const PerformanceAnalytics = ({ score, trend, history = [] }: { score: nu
                                     filter="url(#glow)"
                                 />
                             </svg>
-                            <div className="flex justify-between px-1 mt-2 text-[8px] font-bold text-slate-300 uppercase tracking-tighter">
+                             <div className="flex justify-between px-1 mt-3 text-[9px] font-black text-secondary uppercase tracking-widest opacity-60">
                                 <span>Week 1</span>
                                 <span>Week 2</span>
                                 <span>Week 3</span>
-                                <span>Current</span>
+                                <span className="text-primary opacity-100">Current</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-slate-50 rounded-2xl p-4 border border-border flex justify-between items-center">
+                    <div className="bg-background rounded-2xl p-5 border border-border flex justify-between items-center shadow-inner">
                         <div>
-                            <p className="text-[9px] font-black text-secondary/40 uppercase tracking-widest mb-1">Projected NCET Score</p>
+                            <p className="text-[10px] font-black text-secondary uppercase tracking-widest mb-1 opacity-70">Projected NCET Score</p>
                             <h4 className="text-2xl font-black text-foreground">{score}</h4>
                         </div>
                         <div className="text-right">
