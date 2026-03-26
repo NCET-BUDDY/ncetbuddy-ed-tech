@@ -8,8 +8,8 @@
  *   DISCORD_WEBHOOK_URL — your Discord webhook URL
  */
 export default async ({ req, res, log, error }) => {
-  // 1. Grab the Webhook URL from Appwrite environment variables
-  const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  // 1. Grab the Webhook URL from Appwrite environment variables or hardcode it
+  const discordWebhookUrl = process.env.DISCORD_WEBHOOK_URL || "https://discord.com/api/webhooks/1486857618562613391/WWDgshhemqSwTuLL-8Vx1IjiSlzo5sifXaZRy_R8_k90IwxmIB5zfP5c7b3Ab8BCJSRN";
 
   if (!discordWebhookUrl) {
     error("Discord Webhook URL is missing.");
