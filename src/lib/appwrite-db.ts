@@ -1,4 +1,4 @@
-import { databases, storage, isAppwriteConfigured } from "./appwrite-student";
+import { databases, analyticsDatabases, storage, isAppwriteConfigured } from "./appwrite-student";
 import { ID, Query, Models } from "appwrite";
 import { Test, Book, FormulaCard, Notification, PYQ, SiteSettings, UserProfile, TestResult, VideoClass, Educator, VideoProgress, Purchase, Payment, EducatorVideo, EducatorStats, UserEvent, UserAnalytics, TestRankEntry, TestPerformanceSummary, QuestionAnalysis, AdminTestAnalytics, ForumPost, ForumComment, ForumCategory, CarouselBanner } from "@/types";
 import { cachedFetch, invalidateCache, invalidateCacheByPrefix, CacheKeys, CACHE_TTL } from "./appwrite-cache";
@@ -381,7 +381,7 @@ export const saveTestResult = async (result: Partial<TestResult> & { correctCoun
 
         try {
             // Attempt to save with full analytics data
-            await databases.createDocument(
+            await analyticsDatabases.createDocument(
                 DB_ID,
                 'test-results',
                 ID.unique(),
@@ -392,9 +392,9 @@ export const saveTestResult = async (result: Partial<TestResult> & { correctCoun
             // Appwrite returns 400 for validation errors or unknown attributes
             if (initialError.code === 400 || (initialError.message && (initialError.message.includes('Attribute not found') || initialError.message.includes('unknown') || initialError.message.includes('Invalid document structure')))) {
                 console.warn("Enhanced analytics fields likely missing in schema. Fallback to basic save.");
-                await databases.createDocument(
-                    DB_ID,
-                    'test-results',
+                await analyticsDatabases.createDocument(
+                DB_ID,
+                'test-results',
                     ID.unique(),
                     baseDocData
                 );
@@ -435,7 +435,7 @@ export const getLeaderboard = async (limit: number = 10): Promise<UserProfile[]>
             ]);
             const users = usersResponse.documents.map(doc => ({ uid: doc.$id, ...doc })) as unknown as UserProfile[];
 
-            const resultsResponse = await databases.listDocuments(DB_ID, 'test-results', [
+            const resultsResponse = await analyticsDatabases.listDocuments(DB_ID, 'test-results', [
                 Query.limit(5000),
                 Query.select(['userId', 'score'])
             ]);
@@ -500,7 +500,7 @@ export const getLeaderboardSummary = async (currentUserId: string): Promise<{
         const users = usersResponse.documents.map(doc => ({ uid: doc.$id, ...doc })) as unknown as UserProfile[];
 
         // 2. Fetch all test results
-        const resultsResponse = await databases.listDocuments(DB_ID, 'test-results', [
+        const resultsResponse = await analyticsDatabases.listDocuments(DB_ID, 'test-results', [
             Query.limit(5000),
             // We need createdAt to show date in test-wise performance
             Query.select(['userId', 'score', 'testId', '$createdAt'])
@@ -652,7 +652,7 @@ export const getUserTestResults = async (userId: string): Promise<TestResult[]> 
     if (!isAppwriteConfigured()) return [];
     return cachedFetch(CacheKeys.userTestResults(userId), async () => {
         try {
-            const response = await databases.listDocuments(DB_ID, 'test-results', [
+            const response = await analyticsDatabases.listDocuments(DB_ID, 'test-results', [
                 Query.equal('userId', userId),
                 Query.orderDesc('completedAt')
             ]);
@@ -1547,7 +1547,7 @@ export const getAllUserAnalytics = async (): Promise<UserAnalytics[]> => {
         const users = usersResponse.documents;
 
         // 2. Fetch all test results
-        const resultsResponse = await databases.listDocuments(DB_ID, 'test-results', [
+        const resultsResponse = await analyticsDatabases.listDocuments(DB_ID, 'test-results', [
             Query.limit(5000),
             Query.orderDesc('completedAt')
         ]);
@@ -1662,7 +1662,7 @@ export const getTestLeaderboard = async (testId: string, currentUserId?: string)
     if (!isAppwriteConfigured()) return { leaderboard: [], userRank: null };
     try {
         // 1. Fetch ALL test results for this test
-        const resultsResponse = await databases.listDocuments(DB_ID, 'test-results', [
+        const resultsResponse = await analyticsDatabases.listDocuments(DB_ID, 'test-results', [
             Query.equal('testId', testId),
             Query.limit(5000)
         ]);
@@ -1874,7 +1874,7 @@ export const getQuestionLevelAnalysis = async (testId: string, userAnswers: Reco
             questions = parsedQuestions;
 
             // Fetch results for global stats (limit to 1000 for performance)
-            const resultsResponse = await databases.listDocuments(DB_ID, 'test-results', [
+            const resultsResponse = await analyticsDatabases.listDocuments(DB_ID, 'test-results', [
                 Query.equal('testId', testId),
                 Query.limit(1000),
                 Query.select(['answers']) // Only fetch what we need
@@ -1958,7 +1958,7 @@ export const getAdminTestAnalytics = async (testId: string): Promise<AdminTestAn
         const totalQ = questions.length;
 
         // Get all results
-        const resultsResponse = await databases.listDocuments(DB_ID, 'test-results', [
+        const resultsResponse = await analyticsDatabases.listDocuments(DB_ID, 'test-results', [
             Query.equal('testId', testId),
             Query.limit(5000)
         ]);
@@ -2080,7 +2080,7 @@ export const getAdminTestAnalytics = async (testId: string): Promise<AdminTestAn
 export const getAllTestResults = async (): Promise<TestResult[]> => {
     if (!isAppwriteConfigured()) return [];
     try {
-        const response = await databases.listDocuments(DB_ID, 'test-results', [
+        const response = await analyticsDatabases.listDocuments(DB_ID, 'test-results', [
             Query.limit(5000),
             Query.orderDesc('completedAt')
         ]);
@@ -2140,7 +2140,7 @@ export const getAdminStudentPerformance = async (): Promise<StudentPerformanceDa
         const users = usersResponse.documents;
 
         // 2. Fetch all test results
-        const resultsResponse = await databases.listDocuments(DB_ID, 'test-results', [
+        const resultsResponse = await analyticsDatabases.listDocuments(DB_ID, 'test-results', [
             Query.limit(5000),
             Query.orderDesc('completedAt')
         ]);
