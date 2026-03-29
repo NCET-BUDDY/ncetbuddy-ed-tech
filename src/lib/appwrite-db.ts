@@ -3,7 +3,7 @@ import { ID, Query, Models } from "appwrite";
 import { Test, Book, FormulaCard, Notification, PYQ, SiteSettings, UserProfile, TestResult, VideoClass, Educator, VideoProgress, Purchase, Payment, EducatorVideo, EducatorStats, UserEvent, UserAnalytics, TestRankEntry, TestPerformanceSummary, QuestionAnalysis, AdminTestAnalytics, ForumPost, ForumComment, ForumCategory, CarouselBanner } from "@/types";
 import { cachedFetch, invalidateCache, invalidateCacheByPrefix, CacheKeys, CACHE_TTL } from "./appwrite-cache";
 
-const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db';
+const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7';
 
 // --- Carousel Banners ---
 export const getBanners = async (): Promise<CarouselBanner[]> => {

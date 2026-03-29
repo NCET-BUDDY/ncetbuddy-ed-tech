@@ -63,7 +63,7 @@ export default function LeaderboardPage() {
         const THROTTLE_MS = 60 * 1000; // At most one refresh per 60 seconds
 
         try {
-            const channel = `databases.${process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db'}.collections.test-results.documents`;
+            const channel = `databases.${process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7'}.collections.test-results.documents`;
 
             unsubscribe = client.subscribe(channel, (response) => {
                 const eventType = response.events[0];

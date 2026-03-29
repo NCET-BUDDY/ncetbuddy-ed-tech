@@ -3,7 +3,7 @@ import { Client, Account, Databases, Storage, Functions } from 'appwrite';
 const client = new Client();
 const analyticsClient = new Client();
 
-const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'https://cloud.appwrite.io/v1';
+const endpoint = process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'https://sgp.cloud.appwrite.io/v1';
 const projectId = process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_STUDENT || process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID;
 const analyticsProjectId = process.env.NEXT_PUBLIC_APPWRITE_ANALYTICS_PROJECT_ID;
 

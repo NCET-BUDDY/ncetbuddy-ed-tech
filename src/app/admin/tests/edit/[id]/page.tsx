@@ -10,7 +10,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Test, Question } from "@/types";
 import { databases } from "@/lib/appwrite-student";
 
-const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db';
+const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7';
 
 export default function EditTestPage() {
     const router = useRouter();

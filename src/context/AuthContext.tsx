@@ -38,24 +38,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         try {
-            const session = await account.get();
+            // Wait for Appwrite session to be ready (OAuth takes time to propagate)
+            let session;
+            let retries = 0;
+            const maxRetries = 5;
+
+            while (retries < maxRetries) {
+                try {
+                    session = await account.get();
+                    break;
+                } catch (err) {
+                    retries++;
+                    if (retries >= maxRetries) throw err;
+                    // Exponential backoff: 500ms, 1s, 2s, 4s...
+                    await new Promise(resolve => setTimeout(resolve, 500 * Math.pow(2, retries - 1)));
+                }
+            }
+
+            if (!session) throw new Error("Session discovery failed");
+
             setUser(session);
 
             // Fetch User Role from Database (collection 'users')
-            // Assuming we store role in a 'users' collection with document ID = user ID
             try {
                 const userDoc = await databases.getDocument(
-                    process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db',
+                    process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7',
                     'users',
                     session.$id
                 );
                 setRole(userDoc.role as "user" | "admin");
             } catch (error) {
                 console.warn("User document not found. Attempting to heal (recreate)...");
-                // SELF-HEALING: If doc is missing (likely due to previous bug), recreate it.
                 try {
                     await databases.createDocument(
-                        process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db',
+                        process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7',
                         'users',
                         session.$id,
                         {
@@ -71,7 +87,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     setRole("user");
                 } catch (healError) {
                     console.error("Failed to heal user document:", healError);
-                    // If healing fields, we MUST logout to prevent "bypass" / ghost state.
                     await account.deleteSession('current');
                     setUser(null);
                     setRole(null);

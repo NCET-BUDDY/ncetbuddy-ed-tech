@@ -14,7 +14,7 @@ const databases = new Databases(client);
  */
 export async function getUserRole(userId: string): Promise<string | null> {
     try {
-        const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db';
+        const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7';
 
         const response = await databases.getDocument(dbId, 'user_profiles', userId);
 
@@ -39,7 +39,7 @@ export async function upsertUserProfile(
     }
 ): Promise<void> {
     try {
-        const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db';
+        const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7';
 
         // Try to get existing profile
         try {

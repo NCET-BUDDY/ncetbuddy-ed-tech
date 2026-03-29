@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Step 3: Fetch educator code document
-        const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db';
+        const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7';
 
         let codeDoc;
         try {

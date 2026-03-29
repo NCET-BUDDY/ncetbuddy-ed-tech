@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         const codeHash = hashCode(clientCode);
 
         // Query database for matching code
-        const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db';
+        const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7';
 
         const response = await databases.listDocuments(dbId, 'educator_codes', [
             Query.equal('codeHash', codeHash),

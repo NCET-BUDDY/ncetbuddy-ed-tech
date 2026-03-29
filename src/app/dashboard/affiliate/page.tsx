@@ -6,7 +6,7 @@ import { Copy, IndianRupee, TrendingUp, Users, AlertCircle, CheckCircle2, Link a
 import { databases, isAppwriteConfigured } from "@/lib/appwrite-student";
 import { Query, ID } from "appwrite";
 
-const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db';
+const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7';
 
 interface Earning {
     $id: string;

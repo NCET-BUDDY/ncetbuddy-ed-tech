@@ -39,7 +39,7 @@ export async function middleware(request: NextRequest) {
             const user = await account.get();
 
             // Check user role in user_profiles collection
-            const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || 'ncet-buddy-db';
+            const dbId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '69c84948001622ba05f7';
 
             let userProfile;
             try {
