@@ -4,13 +4,13 @@ import { Client, Databases, Storage } from 'node-appwrite';
 const client = new Client()
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT || 'https://sgp.cloud.appwrite.io/v1')
     .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_STUDENT!)
-    .setKey(process.env.APPWRITE_API_KEY!);
+    .setKey(process.env.APPWRITE_API_KEY_STUDENT || process.env.APPWRITE_API_KEY!);
 
-console.log("Appwrite Admin Config:", {
+console.log("Appwrite Admin Config (Student):", {
     endpoint: process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT,
     projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_STUDENT,
     dbId: process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID,
-    hasKey: !!process.env.APPWRITE_API_KEY
+    hasKey: !!(process.env.APPWRITE_API_KEY_STUDENT || process.env.APPWRITE_API_KEY)
 });
 
 const databases = new Databases(client);

@@ -42,7 +42,7 @@
       ],
       "env": {
         "APPWRITE_PROJECT_ID": "69c819fc000d6d37a423",
-        "APPWRITE_API_KEY": "<YOUR_APPWRITE_API_KEY>",
+        "APPWRITE_API_KEY": "standard_ed60486da489f832bc3b7c9b7d6121362f25fa18a2f883664e0f64950f3a09f441887d2a2df6394b9e17081c6116c75b1713a1f1e562307e0622b16d84cd2b1f69c9a26019aaad1a1323f5a7b9d26f1ef1d72588400d7907234266e051a53c29966ca5a9084b47e7f507a7cbfd1e9d20c687bca63c1e00f8cbfde5c1cf4f45ef",
         "APPWRITE_ENDPOINT": "https://fra.cloud.appwrite.io/v1"
       }
     }

@@ -3,8 +3,10 @@ import { databases, DB_ID } from '@/lib/server/appwrite-admin';
 import { ID, Query } from 'node-appwrite';
 
 export async function POST(request: Request) {
+    let userId: string | undefined;
     try {
-        const { userId } = await request.json();
+        const body = await request.json();
+        userId = body.userId;
 
         if (!userId) {
             return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -42,7 +44,20 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, message: "Test access granted successfully." });
 
     } catch (error: any) {
-        console.error("API Error (Admin Grant Access):", error);
-        return NextResponse.json({ error: error.message || "An error occurred" }, { status: 500 });
+        console.error("API Error (Admin Grant Access):", {
+            message: error.message,
+            code: error.code,
+            type: error.type,
+            userId,
+            env: {
+                projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_STUDENT,
+                dbId: DB_ID,
+                hasKey: !!(process.env.APPWRITE_API_KEY_STUDENT || process.env.APPWRITE_API_KEY)
+            }
+        });
+        return NextResponse.json({ 
+            error: error.message || "An error occurred",
+            details: error.code === 401 ? "Check APPWRITE_API_KEY and Project ID mapping" : undefined
+        }, { status: 500 });
     }
 }
