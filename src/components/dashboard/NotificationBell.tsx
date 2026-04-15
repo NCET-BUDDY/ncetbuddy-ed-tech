@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { getNotifications } from "@/lib/appwrite-db";
+import { getNotifications } from "@/lib/pocketbase-db";
 import { Notification } from "@/types";
 import { Bell, BellOff, AlertTriangle, Info, PartyPopper } from "lucide-react";
 

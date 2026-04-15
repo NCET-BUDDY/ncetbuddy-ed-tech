@@ -2,12 +2,12 @@
 
 import { Card } from "@/components/ui/Card";
 import { useEffect, useState } from "react";
-import { getLeaderboardSummary, getUserProfile, getEducator } from "@/lib/appwrite-db";
+import { getLeaderboardSummary, getUserProfile, getEducator } from "@/lib/pocketbase-db";
 import { UserProfile, Educator } from "@/types";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
 
-import client from "@/lib/appwrite-student";
+import client from "@/lib/pocketbase";
 
 export default function LeaderboardPage() {
     const { user } = useAuth();

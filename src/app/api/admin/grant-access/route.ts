@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { databases, DB_ID } from '@/lib/server/appwrite-admin';
-import { ID, Query } from 'node-appwrite';
+import { getAdminPB } from '@/lib/pocketbase-server';
 
 export async function POST(request: Request) {
     let userId: string | undefined;
@@ -12,52 +11,31 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Missing userId" }, { status: 400 });
         }
 
-        // Check if user already has access
-        const existingPayments = await databases.listDocuments(DB_ID, 'payments', [
-            Query.equal('userId', userId),
-            Query.equal('productName', "NCET Ready Test"),
-            Query.equal('status', 'Credit')
-        ]);
+        const pb = await getAdminPB();
 
-        if (existingPayments.documents.length > 0) {
+        const existingPayments = await pb.collection('payments').getList(1, 1, {
+            filter: `userId = "${userId}" && productName = "NCET Ready Test" && status = "Credit"`
+        });
+
+        if (existingPayments.items.length > 0) {
             return NextResponse.json({ success: true, message: "User already has access." });
         }
 
-        // Create manual payment record with Server API Key (bypassing permissions)
         const manualPaymentId = `manual_admin_unlock_${Date.now()}`;
 
-        await databases.createDocument(
-            DB_ID,
-            'payments',
-            ID.unique(),
-            {
-                userId,
-                paymentId: manualPaymentId,
-                paymentRequestId: manualPaymentId,
-                amount: 0,
-                status: 'Credit',
-                productName: "NCET Ready Test",
-                createdAt: Math.floor(Date.now() / 1000)
-            }
-        );
+        await pb.collection('payments').create({
+            userId,
+            paymentId: manualPaymentId,
+            paymentRequestId: manualPaymentId,
+            amount: 0,
+            status: 'Credit',
+            productName: "NCET Ready Test",
+            createdAt: Math.floor(Date.now() / 1000)
+        });
 
         return NextResponse.json({ success: true, message: "Test access granted successfully." });
 
     } catch (error: any) {
-        console.error("API Error (Admin Grant Access):", {
-            message: error.message,
-            code: error.code,
-            type: error.type,
-            userId,
-            env: {
-                projectId: process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID_STUDENT,
-                dbId: DB_ID,
-                hasKey: !!(process.env.APPWRITE_API_KEY_STUDENT || process.env.APPWRITE_API_KEY)
-            }
-        });
-        return NextResponse.json({ 
-            error: error.message || "An error occurred",
-            details: error.code === 401 ? "Check APPWRITE_API_KEY and Project ID mapping" : undefined
-        }, { status: 500 });
+        return NextResponse.json({ error: error.message || "An error occurred" }, { status: 500 });
     }
 }

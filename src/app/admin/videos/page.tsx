@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { VideoClass } from "@/types";
-import { getVideoClasses, createVideoClass, deleteVideoClass } from "@/lib/appwrite-db";
+import { getVideoClasses, createVideoClass, deleteVideoClass } from "@/lib/pocketbase-db";
 
 import { useAuth } from "@/context/AuthContext";
 

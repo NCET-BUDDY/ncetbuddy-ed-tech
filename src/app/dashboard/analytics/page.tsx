@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/Card";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState, useMemo } from "react";
-import { getUserTestResults, getTestById, getUserProfile, getEducator, hasCompletedAnyPurchase } from "@/lib/appwrite-db";
+import { getUserTestResults, getTestById, getUserProfile, getEducator, hasCompletedAnyPurchase } from "@/lib/pocketbase-db";
 import { TestResult, Test, UserProfile, Educator } from "@/types";
 import Link from "next/link";
 import ProAnalyticsDashboard from "@/components/analytics/ProAnalyticsDashboard";

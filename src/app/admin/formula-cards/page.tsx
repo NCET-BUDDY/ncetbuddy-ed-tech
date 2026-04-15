@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { FormulaCard } from "@/types";
-import { getFormulaCards, createFormulaCard, deleteFormulaCard, updateFormulaCard } from "@/lib/appwrite-db";
+import { getFormulaCards, createFormulaCard, deleteFormulaCard, updateFormulaCard } from "@/lib/pocketbase-db";
 
 export default function FormulaCardsManagerPage() {
     const [cards, setCards] = useState<FormulaCard[]>([]);

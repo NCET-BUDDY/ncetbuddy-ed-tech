@@ -3,10 +3,8 @@
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect } from "react";
 import { Copy, IndianRupee, TrendingUp, Users, AlertCircle, CheckCircle2, Link as LinkIcon } from "lucide-react";
-import { databases, isAppwriteConfigured } from "@/lib/appwrite-student";
-import { Query, ID } from "appwrite";
-
-const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '';
+import pb, { isPocketBaseConfigured } from "@/lib/pocketbase";
+import { affiliateApi, paymentApi } from "@/lib/pocketbase-db";
 
 interface Earning {
     $id: string;
@@ -35,24 +33,24 @@ export default function AffiliateDashboard() {
     const [withdrawalMessage, setWithdrawalMessage] = useState({ type: "", text: "" });
 
     useEffect(() => {
-        if (!user || !isAppwriteConfigured()) return;
+        if (!user || !isPocketBaseConfigured()) return;
 
         const fetchData = async () => {
             try {
                 // Fetch earnings
-                const earningsRes = await databases.listDocuments(DB_ID, 'affiliate_earnings', [
-                    Query.equal('affiliateId', user.$id),
-                    Query.orderDesc('createdAt')
-                ]);
+                const earningsRes = await pb.collection('affiliate_earnings').getFullList({
+                    filter: `affiliateId = "${user.id}"`,
+                    sort: '-created'
+                });
 
                 // Fetch withdrawals
-                const withdrawalRes = await databases.listDocuments(DB_ID, 'withdrawal_requests', [
-                    Query.equal('userId', user.$id),
-                    Query.orderDesc('createdAt')
-                ]);
+                const withdrawalRes = await pb.collection('withdrawal_requests').getFullList({
+                    filter: `userId = "${user.id}"`,
+                    sort: '-created'
+                });
 
-                setEarnings(earningsRes.documents as unknown as Earning[]);
-                setWithdrawals(withdrawalRes.documents as unknown as Withdrawal[]);
+                setEarnings(earningsRes as unknown as Earning[]);
+                setWithdrawals(withdrawalRes as unknown as Withdrawal[]);
             } catch (error) {
                 console.error("Error fetching affiliate data:", error);
             } finally {
@@ -105,8 +103,8 @@ export default function AffiliateDashboard() {
         setWithdrawalMessage({ type: "", text: "" });
 
         try {
-            const newWithdrawal = await databases.createDocument(DB_ID, 'withdrawal_requests', ID.unique(), {
-                userId: user.$id,
+            const newWithdrawal = await pb.collection('withdrawal_requests').create({
+                userId: user.id,
                 amount: availableBalance,
                 upiId: withdrawalUpi,
                 status: 'pending',
@@ -260,7 +258,7 @@ export default function AffiliateDashboard() {
                                                         {isWithdrawal ? 'Withdrawal Request' : 'Referral Sale'}
                                                     </div>
                                                     <div className="text-sm text-slate-500">
-                                                        {new Date(parseInt((item.createdAt || '0').toString()) * 1000 || Date.now()).toLocaleDateString()}
+                                                        {new Date(item.createdAt || item.created).toLocaleDateString()}
                                                     </div>
                                                 </div>
                                             </div>

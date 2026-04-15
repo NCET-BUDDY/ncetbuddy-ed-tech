@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useParams } from "next/navigation";
 import { ForumPost, ForumComment as ForumCommentType } from "@/types";
-import { getForumPostById, getForumComments, createForumComment, upvoteForumPost } from "@/lib/appwrite-db";
+import { getForumPostById, getForumComments, createForumComment, upvoteForumPost } from "@/lib/pocketbase-db";
 import CommentCard from "@/components/forum/CommentCard";
 import Link from "next/link";
 

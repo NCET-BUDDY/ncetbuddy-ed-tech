@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { account } from "@/lib/appwrite-student";
+import pb from "@/lib/pocketbase";
 import { useAuth } from "@/context/AuthContext";
-import { OAuthProvider } from "appwrite";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 
@@ -19,15 +18,12 @@ export default function LoginPage() {
     // Don't auto-redirect logged-in users - let them access /login
     // This prevents a back-button loop where /dashboard ← /login → /dashboard
 
-    const handleGoogleLogin = () => {
+    const handleGoogleLogin = async () => {
         trackEvent('login', '/login', 'method:google_init');
         try {
-            const origin = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-            account.createOAuth2Session(
-                OAuthProvider.Google,
-                `${origin}/dashboard`,
-                `${origin}/login`
-            );
+            const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
+            // Successfully logged in via PocketBase - auth state is automatically synced globally
+            router.push('/dashboard');
         } catch (err: any) {
             console.error("Google login failed:", err);
             setError("Failed to initialize Google login");

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Notification } from "@/types";
-import { getNotifications, createNotification } from "@/lib/appwrite-db";
+import { getNotifications, createNotification } from "@/lib/pocketbase-db";
 
 export default function NotificationsManagerPage() {
     const [notifications, setNotifications] = useState<Notification[]>([]);

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import styles from "./TestEngine.module.css";
 import { useRouter } from "next/navigation";
-import { getTestById, saveTestResult, hasUserPaidForProduct } from "@/lib/appwrite-db";
+import { getTestById, saveTestResult, hasUserPaidForProduct } from "@/lib/pocketbase-db";
 import { useAuth } from "@/context/AuthContext";
 import { Test } from "@/types";
 import { LatexRenderer } from "@/components/ui/LatexRenderer";

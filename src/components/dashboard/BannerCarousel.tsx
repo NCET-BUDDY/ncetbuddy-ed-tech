@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getActiveBanners } from "@/lib/appwrite-db";
+import { getActiveBanners } from "@/lib/pocketbase-db";
 import { CarouselBanner } from "@/types";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";

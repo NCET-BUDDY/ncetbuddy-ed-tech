@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { getTests, getAdminTestAnalytics } from "@/lib/appwrite-db";
+import { getTests, getAdminTestAnalytics } from "@/lib/pocketbase-db";
 import { Test, AdminTestAnalytics } from "@/types";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";

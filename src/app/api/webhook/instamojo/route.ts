@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { databases, DB_ID } from "@/lib/server/appwrite-admin";
-import { ID } from "node-appwrite";
+import { getAdminPB } from "@/lib/pocketbase-server";
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
     try {
         const contentType = request.headers.get("content-type") || "";
 
-        // Instamojo sends data as application/x-www-form-urlencoded
         if (!contentType.includes("application/x-www-form-urlencoded")) {
             return NextResponse.json({ error: "Invalid content-type" }, { status: 400 });
         }
@@ -15,7 +13,6 @@ export async function POST(request: NextRequest) {
         const formData = await request.formData();
         const data: Record<string, string> = {};
 
-        // Convert FormData to object for MAC calculation
         formData.forEach((value, key) => {
             data[key] = value.toString();
         });
@@ -24,38 +21,24 @@ export async function POST(request: NextRequest) {
         const macProvided = data.mac;
 
         if (!salt) {
-            console.error("INSTAMOJO_SALT not defined in environment variables");
+            console.error("INSTAMOJO_SALT not defined");
             return NextResponse.json({ error: "Server Configuration Error" }, { status: 500 });
         }
 
-        // 1. Verify MAC (Message Authentication Code)
-        // Sort keys alphabetically (Case-Insensitive as per Instamojo docs)
-        const keys = Object.keys(data)
-            .filter(k => k !== 'mac')
-            .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-
+        const keys = Object.keys(data).filter(k => k !== 'mac').sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
         const message = keys.map(k => `${data[k]}`).join('|');
-
-        const generatedMac = crypto.createHmac('sha1', salt)
-            .update(message)
-            .digest('hex');
+        const generatedMac = crypto.createHmac('sha1', salt).update(message).digest('hex');
 
         if (generatedMac !== macProvided) {
-            console.error("Invalid MAC address - potential tampering");
             return NextResponse.json({ error: "Invalid MAC" }, { status: 400 });
         }
 
-        // 2. Process Payment Status
         const paymentId = data.payment_id;
         const paymentRequestId = data.payment_request_id;
-        const status = data.status; // 'Credit' or 'Failed'
+        const status = data.status; 
         const amount = parseFloat(data.amount);
-        const purpose = data.purpose; // E.g., "NCET Ready Test:USER_ID"
+        const purpose = data.purpose;
 
-        console.log(`Webhook Received: Payment ${paymentId} for Request ${paymentRequestId} is ${status}`);
-
-        // We embed userId in the purpose string during creation to extract it safely here
-        // fallback to extracting from purpose if we structured it as "Product Name|userId"
         let userId = "UNKNOWN";
         let productName = purpose;
         let affiliateId = null;
@@ -67,29 +50,23 @@ export async function POST(request: NextRequest) {
             if (parts.length > 2) affiliateId = parts[2];
         }
 
-        // 3. Write securely to database
-        if (status === 'Credit') {
-            await databases.createDocument(
-                DB_ID,
-                'payments',
-                ID.unique(),
-                {
-                    userId: userId,
-                    paymentId: paymentId,
-                    paymentRequestId: paymentRequestId,
-                    amount: amount,
-                    status: status,
-                    productName: productName,
-                    createdAt: Math.floor(Date.now() / 1000)
-                }
-            );
+        const pb = await getAdminPB();
 
-            // 4. Handle Affiliate Commission
+        if (status === 'Credit') {
+            await pb.collection('payments').create({
+                userId: userId,
+                paymentId: paymentId,
+                paymentRequestId: paymentRequestId,
+                amount: amount,
+                status: status,
+                productName: productName,
+                createdAt: Math.floor(Date.now() / 1000)
+            });
+
             if (affiliateId && affiliateId !== userId) {
-                // 25% commission
                 const commission = amount * 0.25;
                 try {
-                    await databases.createDocument(DB_ID, 'affiliate_earnings', ID.unique(), {
+                    await pb.collection('affiliate_earnings').create({
                         affiliateId: affiliateId,
                         amount: commission,
                         status: 'pending',
@@ -97,26 +74,12 @@ export async function POST(request: NextRequest) {
                         purchaseId: paymentId,
                         createdAt: Math.floor(Date.now() / 1000)
                     });
-                    console.log(`Earned ₹${commission} commission for affiliate ${affiliateId}`);
-                } catch (e) {
-                    console.error("Failed to record affiliate commission:", e);
-                }
+                } catch (e) {}
             }
 
-            // 5. INSTANT ACCESS PROXY: Automatically upgrade user profile premium status universally
             try {
-                await databases.updateDocument(DB_ID, 'user_profiles', userId, {
-                    premiumStatus: true
-                });
-                console.log(`Upgraded premiumStatus to true for user ${userId}`);
-            } catch (e) {
-                // Ignore fallback to legacy 'users'
-                try {
-                    await databases.updateDocument(DB_ID, 'users', userId, {
-                        premiumStatus: true
-                    });
-                } catch (err) { }
-            }
+                await pb.collection('users').update(userId, { premiumStatus: true });
+            } catch (e) { }
         }
 
         return NextResponse.json({ success: true });

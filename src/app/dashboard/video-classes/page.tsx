@@ -9,7 +9,7 @@ import {
     getVideoProgress,
     updateVideoProgress,
     getFileDownloadUrl
-} from "@/lib/appwrite-db";
+} from "@/lib/pocketbase-db";
 import { parseEducatorXml, EducatorCatalog, Module, Video } from "@/lib/xml-parser";
 import { Educator, VideoProgress } from "@/types";
 import { Card } from "@/components/ui/Card";

@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { account } from "@/lib/appwrite-student";
+import pb from "@/lib/pocketbase";
 import { useAuth } from "@/context/AuthContext";
-import { OAuthProvider } from "appwrite";
 import Link from "next/link";
 import { Card } from "@/components/ui/Card";
 
@@ -15,14 +14,10 @@ export default function SignupPage() {
 
     // Don't auto-redirect logged-in users - prevents back button loop
 
-    const handleGoogleSignup = () => {
+    const handleGoogleSignup = async () => {
         try {
-            const origin = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-            account.createOAuth2Session(
-                OAuthProvider.Google,
-                `${origin}/dashboard`,
-                `${origin}/signup`
-            );
+            const authData = await pb.collection('users').authWithOAuth2({ provider: 'google' });
+            router.push('/dashboard');
         } catch (err: any) {
             console.error("Google signup failed:", err);
             setError("Failed to initialize Google login");

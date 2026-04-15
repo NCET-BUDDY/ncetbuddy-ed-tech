@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { updateUser } from '@/lib/appwrite-db';
+import { updateUser } from '@/lib/pocketbase-db';
 import { UserProfile } from '@/types';
 
 interface MentorshipModalProps {

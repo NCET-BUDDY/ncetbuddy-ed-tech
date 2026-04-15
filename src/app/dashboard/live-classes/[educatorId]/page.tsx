@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getEducator, getFileViewUrl } from "@/lib/appwrite-db";
+import { getEducator, getFileViewUrl } from "@/lib/pocketbase-db";
 import { Educator } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { useParams } from "next/navigation";

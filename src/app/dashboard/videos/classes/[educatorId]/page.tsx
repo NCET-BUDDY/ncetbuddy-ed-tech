@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getEducator, getFileViewUrl, getEducatorVideos } from "@/lib/appwrite-db";
+import { getEducator, getFileViewUrl, getEducatorVideos } from "@/lib/pocketbase-db";
 import { parseEducatorXml, EducatorCatalog } from "@/lib/xml-parser";
 import { Educator, EducatorVideo } from "@/types";
 import { Card } from "@/components/ui/Card";

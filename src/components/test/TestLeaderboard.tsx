@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getTestLeaderboard } from "@/lib/appwrite-db";
+import { getTestLeaderboard } from "@/lib/pocketbase-db";
 import { TestRankEntry } from "@/types";
 import { Trophy } from "lucide-react";
 

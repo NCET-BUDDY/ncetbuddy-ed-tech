@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { LatexRenderer } from "@/components/ui/LatexRenderer";
 import { useState } from "react";
-import { createTest } from "@/lib/appwrite-db";
+import { createTest } from "@/lib/pocketbase-db";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Test, Question, PYQSubject } from "@/types";

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/Button";
-import { getForumPosts, getForumComments, createForumComment } from "@/lib/appwrite-db";
+import { getForumPosts, getForumComments, createForumComment } from "@/lib/pocketbase-db";
 import { ForumPost, ForumComment } from "@/types";
 import { CreatePostModal } from "@/components/forum/CreatePostModal";
 import { Plus, Search, Flame, Smile, Paperclip, Mic, MessageCircle, Lock, ArrowLeft } from "lucide-react";

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { getBooks, getFormulaCards } from "@/lib/appwrite-db";
+import { getBooks, getFormulaCards } from "@/lib/pocketbase-db";
 import { Book, FormulaCard } from "@/types";
 
 export default function NotesPage() {

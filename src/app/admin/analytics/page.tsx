@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAllUserAnalytics } from "@/lib/appwrite-db";
+import { getAllUserAnalytics } from "@/lib/pocketbase-db";
 import { UserAnalytics } from "@/types";
 import { Card } from "@/components/ui/Card";
 

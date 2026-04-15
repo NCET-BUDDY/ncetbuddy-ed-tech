@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { databases, DB_ID } from '@/lib/server/appwrite-admin';
-import { Query } from 'node-appwrite';
+import { getAdminPB } from '@/lib/pocketbase-server';
 
 export async function GET(request: Request) {
     try {
@@ -12,49 +11,32 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
         }
 
+        const pb = await getAdminPB();
+
         // 1. Check if user is granted premium access directly
         try {
-            const profileDoc = await databases.getDocument(DB_ID, 'user_profiles', userId);
-            if (profileDoc.premiumStatus === true) {
+            const userDoc = await pb.collection('users').getOne(userId);
+            if (userDoc.premiumStatus === true) {
                 return NextResponse.json({ hasAccess: true, source: 'admin_grant' });
             }
         } catch (e) {
-            // Fallback to legacy 'users' collection
-            try {
-                const legacyDoc = await databases.getDocument(DB_ID, 'users', userId);
-                if (legacyDoc.premiumStatus === true) {
-                    return NextResponse.json({ hasAccess: true, source: 'admin_grant' });
-                }
-            } catch (e2) {
-                // Ignore and proceed
-            }
+            // Ignore
         }
 
         // 2. Fallback: check actual payment records
-        
-        // Special logic for NRT: If product is NRT-related, ANY NRT purchase unlocks ALL NRT tests
         const isNRT = productName.toUpperCase().includes('NRT');
-        
-        const queries = [
-            Query.equal('userId', userId),
-            Query.equal('status', 'Credit')
-        ];
+        const filterStr = isNRT ? `userId = "${userId}" && status = "Credit"` : `userId = "${userId}" && status = "Credit" && productName = "${productName}"`;
 
-        if (!isNRT) {
-            queries.push(Query.equal('productName', productName));
-        }
-
-        const response = await databases.listDocuments(DB_ID, 'payments', queries);
+        const response = await pb.collection('payments').getList(1, 100, { filter: filterStr });
 
         if (isNRT) {
-            // Filter results to find ANY NRT payment if requested product is NRT
-            const hasAnyNRTPayment = response.documents.some(doc => 
+            const hasAnyNRTPayment = response.items.some((doc: any) => 
                 (doc.productName || "").toUpperCase().includes('NRT')
             );
             return NextResponse.json({ hasAccess: hasAnyNRTPayment });
         }
 
-        return NextResponse.json({ hasAccess: response.documents.length > 0 });
+        return NextResponse.json({ hasAccess: response.items.length > 0 });
     } catch (error: any) {
         console.error("API Error (Check Payment):", error);
         return NextResponse.json({ error: error.message }, { status: 500 });

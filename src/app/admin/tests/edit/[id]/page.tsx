@@ -5,12 +5,10 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { LatexRenderer } from "@/components/ui/LatexRenderer";
 import { useState, useEffect } from "react";
-import { getTestById } from "@/lib/appwrite-db";
+import { getTestById } from "@/lib/pocketbase-db";
 import { useRouter, useParams } from "next/navigation";
 import { Test, Question } from "@/types";
-import { databases } from "@/lib/appwrite-student";
-
-const DB_ID = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID || '';
+import pb from "@/lib/pocketbase";
 
 export default function EditTestPage() {
     const router = useRouter();
@@ -83,7 +81,7 @@ export default function EditTestPage() {
 
         setSaving(true);
         try {
-            await databases.updateDocument(DB_ID, 'tests', testId, {
+            await pb.collection('tests').update(testId, {
                 title: testData.title,
                 subject: testData.subject || "General",
                 duration: testData.duration || 60,
@@ -91,7 +89,7 @@ export default function EditTestPage() {
                 testType: testData.testType || 'pyq',
                 pyqSubject: testData.pyqSubject || 'non-domain',
                 price: (testData.price !== undefined && !isNaN(Number(testData.price))) ? Number(testData.price) : 0,
-                questions: JSON.stringify(questions.map((q, i) => ({ ...q, id: `q-${i + 1}` })))
+                questions: questions.map((q, i) => ({ ...q, id: `q-${i + 1}` }))
             });
             alert("Test updated successfully!");
             router.push("/admin/tests");

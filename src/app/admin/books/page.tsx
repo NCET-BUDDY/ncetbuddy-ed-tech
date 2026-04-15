@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Book } from "@/types";
-import { getBooks, createBook, deleteBook, updateBook } from "@/lib/appwrite-db";
+import { getBooks, createBook, deleteBook, updateBook } from "@/lib/pocketbase-db";
 import { FileText } from "lucide-react";
 
 export default function BooksManagerPage() {

@@ -602,19 +602,19 @@ Let's say a student pays ₹100 for an educator mock test:
 
 ### Backend
 
-- **Backend-as-a-Service (BaaS):** Appwrite Cloud
-  - **Database:** NoSQL document database for flexible schema
-  - **Authentication:** OAuth2 (Google) and Email/Password
-  - **Storage:** Secure file storage for images, PDFs, etc.
-  - **Permissions:** Role-based access control (RBAC)
+- **Backend-as-a-Service (BaaS):** Self-hosted PocketBase
+  - **Database:** SQLite (embedded) for rapid reads/writes and zero latency
+  - **Authentication:** OAuth2 (Google) and Email/Password via PocketBase
+  - **Storage:** Local persistent storage (managed by PocketBase)
+  - **Permissions:** API rules for Role-based access control (RBAC)
 
 ---
 
 ### Authentication Service
 
-- **Student Auth:** Google OAuth via Appwrite
+- **Student Auth:** Google OAuth via PocketBase
 - **Educator Auth:** Email/password with client code verification
-- **Session Management:** JWT tokens with automatic expiry and refresh
+- **Session Management:** PocketBase Auth tokens with secure cookies
 
 ---
 
@@ -633,9 +633,11 @@ Let's say a student pays ₹100 for an educator mock test:
 ### Hosting / Deployment Philosophy
 
 - **Frontend Hosting:** Vercel for automatic deployment and global CDN
-- **Backend API:** Appwrite Cloud for managed infrastructure
+- **Backend Infrastructure:** Microsoft Azure VM (Ubuntu)
+- **Containerization/Proxy:** Nginx Reverse Proxy with Cloudflare SSL
+- **Backups:** Automated daily backups of `pb_data` synced to Google Drive via rclone
 - **CI/CD:** GitHub integration with Vercel for continuous deployment
-- **Monitoring:** Vercel Analytics and Appwrite Console for performance tracking
+
 
 ---
 
@@ -828,10 +830,9 @@ npm install
 
 # Configure environment variables
 # Create a .env.local file with:
-# NEXT_PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
-# NEXT_PUBLIC_APPWRITE_PROJECT_ID=your_project_id
-# NEXT_PUBLIC_APPWRITE_DATABASE_ID=ncet-buddy-db
-# APPWRITE_API_KEY=your_api_key
+# NEXT_PUBLIC_POCKETBASE_URL=https://api.yourdomain.com
+# POCKETBASE_ADMIN_EMAIL=admin@example.com
+# POCKETBASE_ADMIN_PASSWORD=your_password
 
 # Run database setup script
 node scripts/setup-schema.js

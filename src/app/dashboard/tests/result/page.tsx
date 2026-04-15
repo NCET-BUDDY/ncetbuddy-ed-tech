@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
-import { getTestPerformanceSummary } from "@/lib/appwrite-db";
+import { getTestPerformanceSummary } from "@/lib/pocketbase-db";
 import { TestPerformanceSummary } from "@/types";
 import { Trophy, Star, Dumbbell, ThumbsUp, TrendingUp, Target, BookOpen, RefreshCw, BarChart2 } from "lucide-react";
 

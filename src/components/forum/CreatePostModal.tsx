@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { createForumPost } from "@/lib/appwrite-db";
+import { createForumPost } from "@/lib/pocketbase-db";
 import { useAuth } from "@/context/AuthContext";
 
 interface CreatePostModalProps {

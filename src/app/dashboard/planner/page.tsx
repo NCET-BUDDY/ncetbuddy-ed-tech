@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
-import { getUserTestResults, getTests, hasCompletedAnyPurchase, getUserProfile } from "@/lib/appwrite-db";
+import { getUserTestResults, getTests, hasCompletedAnyPurchase, getUserProfile } from "@/lib/pocketbase-db";
 import { Test, TestResult } from "@/types";
 import { Brain, Target, Lock, Rocket, Gem, AlertTriangle } from "lucide-react";
 

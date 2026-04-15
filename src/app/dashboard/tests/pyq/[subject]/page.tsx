@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
-import { getTests } from "@/lib/appwrite-db";
+import { getTests } from "@/lib/pocketbase-db";
 import { Test, PYQSubject } from "@/types";
 
 const SUBJECT_INFO: Record<PYQSubject, { label: string; icon: string; description: string }> = {

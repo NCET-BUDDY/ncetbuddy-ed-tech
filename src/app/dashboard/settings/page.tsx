@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from "@/context/AuthContext";
-import { getUserProfile, updateUser } from '@/lib/appwrite-db';
+import { getUserProfile, updateUser } from '@/lib/pocketbase-db';
 import { UserProfile } from '@/types';
 import {
     User,

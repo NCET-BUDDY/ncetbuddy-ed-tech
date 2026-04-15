@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { getLeaderboardSummary } from "@/lib/appwrite-db";
+import { getLeaderboardSummary } from "@/lib/pocketbase-db";
 import SubjectRadar from "./SubjectRadar";
 import TimeAnalysis from "./TimeAnalysis";
 import RankPredictor from "./RankPredictor";

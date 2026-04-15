@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { getEducator, getFileViewUrl, getVideoProgress, updateVideoProgress } from "@/lib/appwrite-db";
+import { getEducator, getFileViewUrl, getVideoProgress, updateVideoProgress } from "@/lib/pocketbase-db";
 import { parseEducatorXml, EducatorCatalog, Module, Video } from "@/lib/xml-parser";
 import { Educator } from "@/types";
 import { useAuth } from "@/context/AuthContext";

@@ -158,7 +158,7 @@ export const CommunityDiscussion = ({ posts }: { posts: any[] }) => {
 };
 
 // --- AI Smart Planner Section ---
-import { PlannerTask } from '@/lib/appwrite-db';
+import { PlannerTask } from '@/lib/pocketbase-db';
 
 export const AISmartPlanner = ({ task, onComplete }: { task: PlannerTask, onComplete?: () => void }) => {
     const handleAction = (e: React.MouseEvent) => {

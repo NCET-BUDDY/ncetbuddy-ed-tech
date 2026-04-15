@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getAdminStudentPerformance, StudentPerformanceData } from "@/lib/appwrite-db";
+import { getAdminStudentPerformance, StudentPerformanceData } from "@/lib/pocketbase-db";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Search, ChevronDown, ChevronUp, AlertTriangle, Trophy, Target, Clock, BookOpen, TrendingDown, Award, Users, BarChart3 } from "lucide-react";

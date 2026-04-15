@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { usePathname } from 'next/navigation';
-import { createUserSession, endUserSession, logUserEvent } from '@/lib/appwrite-db';
+import { createUserSession, endUserSession, logUserEvent } from '@/lib/pocketbase-db';
 import { UserEvent } from '@/types';
 
 interface AnalyticsContextType {

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SiteSettings } from "@/types";
-import { getSettings, saveSettings } from "@/lib/appwrite-db";
+import { getSettings, saveSettings } from "@/lib/pocketbase-db";
 
 export default function SettingsPage() {
     const [settings, setSettings] = useState<SiteSettings>({

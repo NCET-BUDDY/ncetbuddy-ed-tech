@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { account } from "@/lib/appwrite-educator";
 import { useRouter } from "next/navigation";
 import { Models } from "appwrite";
-import { getEducatorStats, getEducatorVideos, createEducatorVideo, deleteEducatorVideo } from "@/lib/appwrite-db";
+import { getEducatorStats, getEducatorVideos, createEducatorVideo, deleteEducatorVideo } from "@/lib/pocketbase-db";
 import { EducatorStats, EducatorVideo } from "@/types";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";

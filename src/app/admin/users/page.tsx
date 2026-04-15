@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { UserProfile } from "@/types";
-import { getUsers, updateUser } from "@/lib/appwrite-db";
+import { getUsers, updateUser } from "@/lib/pocketbase-db";
 
 export default function UsersManagerPage() {
     const [users, setUsers] = useState<UserProfile[]>([]);

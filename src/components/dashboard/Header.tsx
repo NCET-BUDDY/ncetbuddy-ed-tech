@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useState, useEffect, useRef } from "react";
-import { getNotifications, getDailyProgress, updateStreakAndDaily, setUserDailyGoal } from "@/lib/appwrite-db";
+import { getNotifications, getDailyProgress, updateStreakAndDaily, setUserDailyGoal } from "@/lib/pocketbase-db";
 import { Notification } from "@/types";
 import { UserCircle, Flame, PartyPopper, Bell, BellOff, AlertTriangle, Info } from "lucide-react";
 

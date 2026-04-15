@@ -22,7 +22,7 @@ import { Card } from "@/components/ui/Card";
 import Link from "next/link";
 import { PYQSubject, Test, Purchase } from "@/types";
 import { useEffect, useState } from "react";
-import { getTests, hasUserPaidForProduct, getUserPayments, getUserProfile } from "@/lib/appwrite-db";
+import { getTests, hasUserPaidForProduct, getUserPayments, getUserProfile } from "@/lib/pocketbase-db";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PenLine, BookOpen, Microscope, Briefcase, Target, GraduationCap, Users } from "lucide-react";

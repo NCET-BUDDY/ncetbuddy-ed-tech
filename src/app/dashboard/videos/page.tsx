@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { getAllEducators, getUserProfile, getFileViewUrl } from "@/lib/appwrite-db";
+import { getAllEducators, getUserProfile, getFileViewUrl } from "@/lib/pocketbase-db";
 import { Educator } from "@/types";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";

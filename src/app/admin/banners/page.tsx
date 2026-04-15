@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { getBanners, createBanner, updateBanner, deleteBanner } from "@/lib/appwrite-db";
+import { getBanners, createBanner, updateBanner, deleteBanner } from "@/lib/pocketbase-db";
 import { CarouselBanner } from "@/types";
 import { Trash2, Eye, EyeOff, Plus, Link as LinkIcon, Image as ImageIcon, Upload, X } from "lucide-react";
 
