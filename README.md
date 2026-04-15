@@ -195,7 +195,7 @@ This structure ensures:
 
 - One-click Google OAuth for seamless onboarding
 - No password management or email verification friction
-- Secure session management via Appwrite authentication
+- Secure session management via PocketBase authentication
 - Automatic profile creation upon first login
 
 ---
@@ -389,7 +389,7 @@ This structure ensures:
 
 #### Secure Authentication Architecture
 
-- Built on **Appwrite Authentication** with OAuth2 support
+- Built on **PocketBase Authentication** with OAuth2 support
 - Google login for students (OAuth)
 - Email/password for educators (with client code verification)
 - Session tokens with automatic expiry and refresh
@@ -399,7 +399,7 @@ This structure ensures:
 
 #### Scalability-First Mindset
 
-- **Cloud Infrastructure:** Hosted on Vercel (frontend) and Appwrite Cloud (backend)
+- **Cloud Infrastructure:** Hosted on Vercel (frontend) and AWS EC2 (backend)
 - **Auto-Scaling:** Backend scales automatically during high-traffic events (e.g., live mock test sessions with thousands of concurrent users)
 - **CDN Integration:** Static assets served via global CDN for low latency
 - **Database Optimization:** Indexed queries for fast leaderboard and result retrieval
@@ -633,7 +633,7 @@ Let's say a student pays ₹100 for an educator mock test:
 ### Hosting / Deployment Philosophy
 
 - **Frontend Hosting:** Vercel for automatic deployment and global CDN
-- **Backend Infrastructure:** Microsoft Azure VM (Ubuntu)
+- **Backend Infrastructure:** Amazon Web Services (AWS) EC2 (Ubuntu)
 - **Containerization/Proxy:** Nginx Reverse Proxy with Cloudflare SSL
 - **Backups:** Automated daily backups of `pb_data` synced to Google Drive via rclone
 - **CI/CD:** GitHub integration with Vercel for continuous deployment
@@ -815,7 +815,7 @@ We are actively collecting feedback on:
 ### Prerequisites
 
 - Node.js 20+ and npm
-- Appwrite account (Cloud or self-hosted)
+- AWS EC2 instance (for self-hosting PocketBase)
 - Vercel account (recommended for deployment)
 
 ### Installation
