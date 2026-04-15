@@ -21,8 +21,8 @@ export default function LoginPage() {
     const handleGoogleLogin = async () => {
         trackEvent('login', '/login', 'method:google_init');
         try {
-            // First, get the list of auth methods to find Google's auth URL
-            const methods = await pb.collection('users').listAuthMethods();
+            // First, get the list of auth methods to find Google's auth URL using raw fetch to avoid SDK parsing issues
+            const methods = await pb.send('/api/collections/users/auth-methods', {});
             const googleProvider = methods.authProviders?.find((p: any) => p.name === 'google');
             
             if (!googleProvider) {

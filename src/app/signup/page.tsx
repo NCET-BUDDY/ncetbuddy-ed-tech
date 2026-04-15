@@ -16,7 +16,7 @@ export default function SignupPage() {
 
     const handleGoogleSignup = async () => {
         try {
-            const methods = await pb.collection('users').listAuthMethods();
+            const methods = await pb.send('/api/collections/users/auth-methods', {});
             const googleProvider = methods.authProviders?.find((p: any) => p.name === 'google');
             
             if (!googleProvider) {
