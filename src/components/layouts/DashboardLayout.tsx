@@ -172,7 +172,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                         <div className="flex items-center gap-3 pl-4 cursor-pointer group">
                             <div className="text-right hidden sm:block">
-                                <div className="text-sm font-black text-foreground group-hover:text-primary transition-colors">{user.name || "Arjun Mehta"}</div>
+                                <div className="text-sm font-black text-foreground group-hover:text-primary transition-colors">{user.name || user.email.split('@')[0] || "Student"}</div>
                                 <div className="text-[10px] font-bold text-secondary uppercase tracking-widest">{streamName} Stream</div>
                             </div>
                             <div className="w-11 h-11 rounded-2xl overflow-hidden border-2 border-white shadow-md ring-1 ring-slate-100 group-hover:scale-105 transition-transform">
