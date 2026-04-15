@@ -870,7 +870,7 @@ This project is open-sourced under the [MIT License](LICENSE.md).
 ## 📞 Contact & Support
 
 **For Educator Onboarding:**
-- Email: [Contact team for onboarding inquiries]
+- Email: rounakpaul881@gmail.com
 - Partnership opportunities and revenue-sharing agreement requests
 
 **For Student Support:**
