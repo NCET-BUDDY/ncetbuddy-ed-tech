@@ -34,21 +34,35 @@ export default function BannerManagementPage() {
         }
     };
 
-    const convertToDirectLink = (url: string) => {
+    const cleanUrl = (url: string) => {
         if (!url) return "";
+        try {
+            const parsed = new URL(url, typeof window !== "undefined" ? window.location.origin : "http://localhost");
+            if (['http:', 'https:'].includes(parsed.protocol)) {
+                return url;
+            }
+        } catch {
+            if (url.startsWith('/')) return url;
+        }
+        return "";
+    };
+
+    const convertToDirectLink = (url: string) => {
+        const urlStr = cleanUrl(url);
+        if (!urlStr) return "";
 
         // Handle Google Drive sharing links
-        const driveIdMatch = url.match(/\/d\/(.+?)\/(view|edit)?/);
+        const driveIdMatch = urlStr.match(/\/d\/(.+?)\/(view|edit)?/);
         if (driveIdMatch && driveIdMatch[1]) {
             return `https://drive.google.com/uc?export=view&id=${driveIdMatch[1]}`;
         }
 
         // Handle direct view links
-        if (url.includes('drive.google.com/uc?id=')) {
-            return url;
+        if (urlStr.includes('drive.google.com/uc?id=')) {
+            return urlStr;
         }
 
-        return url;
+        return urlStr;
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,7 +94,7 @@ export default function BannerManagementPage() {
             alert('Image uploaded successfully!');
         } catch (error: any) {
             console.error('Error uploading file:', error);
-            alert(error.message || 'Failed to upload image. Make sure the banners bucket exists in Appwrite.');
+            alert(error.message || 'Failed to upload image. Make sure the banners bucket exists in PocketBase.');
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) {
@@ -235,7 +249,7 @@ export default function BannerManagementPage() {
                                         ) : imageUrl ? (
                                             <div style={{ position: "relative", display: "inline-block" }}>
                                                 <img
-                                                    src={imageUrl}
+                                                    src={cleanUrl(imageUrl)}
                                                     alt="Preview"
                                                     style={{ maxWidth: "200px", maxHeight: "100px", borderRadius: "4px", border: "1px solid var(--border)" }}
                                                 />
@@ -305,7 +319,7 @@ export default function BannerManagementPage() {
                             <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
                                 <div style={{ width: "200px", height: "80px", borderRadius: "8px", overflow: "hidden", background: "var(--surface)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                     <img
-                                        src={banner.imageUrl}
+                                        src={cleanUrl(banner.imageUrl)}
                                         alt={banner.title}
                                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                     />
